@@ -2,263 +2,284 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Расписание любимой</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sumbul | Дневник Любимой</title>
     <style>
         :root {
-            --bg-color: #000000;
-            --card-bg: #0c0c0c;
-            --accent-main: #ff007f; /* Розовый неон */
-            --accent-future: #0088ff; /* Синий неон */
-            --text-white: #ffffff;
-            --text-gray: #666666;
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --ios-bg: #000000;
+            --ios-card: rgba(20, 20, 22, 0.8);
+            --ios-accent: #ff2d55;
+            --ios-pink: #ff375f;
+            --ios-blue: #007aff;
+            --ios-green: #30d158;
+            --text-main: #ffffff;
+            --text-secondary: #a1a1a6;
+            --blur-val: blur(10px); 
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            background-color: var(--bg-color);
-            color: var(--text-white);
-            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--ios-bg);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             margin: 0; padding: 0;
-            -webkit-tap-highlight-color: transparent;
+            letter-spacing: -0.03em;
+            overflow-x: hidden;
+        }
+
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(255, 45, 85, 0.35) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(0, 122, 255, 0.3) 0%, transparent 50%);
+            z-index: -1;
+            filter: contrast(1.2);
         }
 
         header {
-            padding: 40px 20px 20px;
-            text-align: center;
-            background: linear-gradient(to bottom, #111, transparent);
+            padding: 65px 20px 25px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(0,0,0,0.7);
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 0.5px solid rgba(255,255,255,0.15);
         }
 
-        h1 {
-            margin: 0; font-size: 1.6rem; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 2px;
-            text-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .date-label { color: var(--ios-pink); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; text-shadow: 0 0 10px rgba(255, 55, 95, 0.5); }
+        h1 { margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1.5px; }
+
+        .view-controls {
+            display: flex; background: rgba(255,255,255,0.12); 
+            padding: 4px; border-radius: 14px; gap: 4px;
+        }
+        .view-btn {
+            border: none; background: transparent; color: var(--text-secondary);
+            width: 44px; height: 36px; border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; transition: all 0.3s ease;
+        }
+        .view-btn.active {
+            background: var(--ios-pink); color: white;
+            box-shadow: 0 0 15px rgba(255, 45, 85, 0.6);
         }
 
-        .sub-header {
-            color: var(--accent-main);
-            font-size: 0.7rem; font-weight: 700;
-            letter-spacing: 4px; margin-top: 5px;
+        .week-nav { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(255,255,255,0.08); padding: 12px 20px; border-radius: 20px;
+            border: 0.5px solid rgba(255,255,255,0.1);
         }
-
-        /* Управление неделями */
-        .week-nav {
-            display: flex; justify-content: center; align-items: center;
-            padding: 20px; gap: 40px;
+        .nav-btn { 
+            background: white; border: none; color: black; 
+            width: 32px; height: 32px; border-radius: 50%; 
+            font-size: 18px; font-weight: 900; box-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
-
         .week-info { text-align: center; }
-        .week-num { font-size: 3.5rem; font-weight: 900; line-height: 1; display: block; }
-        .week-text { font-size: 0.7rem; color: var(--text-gray); text-transform: uppercase; letter-spacing: 2px; }
+        .week-num { font-size: 24px; font-weight: 900; display: block; line-height: 1; color: #fff; }
+        .week-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; }
 
-        .circle-btn {
-            width: 50px; height: 50px; border-radius: 50%;
-            border: 1px solid var(--glass-border);
-            background: transparent; color: white;
-            font-size: 1.2rem; cursor: pointer;
-            transition: 0.3s;
-        }
-        .circle-btn:hover { border-color: var(--accent-main); box-shadow: 0 0 15px var(--accent-main); }
-
-        .main-container { max-width: 600px; margin: 0 auto; padding: 20px; padding-bottom: 100px; }
-
+        .container { padding: 25px 16px 150px; max-width: 600px; margin: 0 auto; }
         .day-section { margin-bottom: 40px; }
-        .day-title {
-            font-size: 1.1rem; font-weight: 800; color: var(--text-white);
-            margin-bottom: 20px; padding-left: 15px;
-            border-left: 2px solid var(--accent-main);
+        .day-title { font-size: 26px; font-weight: 900; margin-bottom: 18px; color: #fff; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+
+        .card {
+            background: var(--ios-card);
+            border-radius: 30px; padding: 22px; margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative; overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        /* КАРТОЧКИ ПАР */
-        .lesson-card {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 20px;
-            margin-bottom: 15px; position: relative;
-            transition: transform 0.3s, border 0.3s;
-        }
-
-        /* АКТУАЛЬНЫЕ (ИДУТ НА ЭТОЙ НЕДЕЛЕ) */
-        .lesson-card.active {
-            border-color: rgba(255, 0, 127, 0.5);
-            background: linear-gradient(145deg, #111, #080808);
-            box-shadow: 0 10px 30px rgba(255, 0, 127, 0.1);
-        }
-        .lesson-card.active .lesson-time { color: var(--accent-main); }
-        .lesson-card.active .lesson-name { color: white; font-size: 1.1rem; }
-
-        /* БУДУЩИЕ ПАРЫ */
-        .lesson-card.waiting {
-            border-color: rgba(0, 136, 255, 0.2);
-            opacity: 0.8;
-        }
-        .lesson-card.waiting .lesson-time { color: var(--accent-future); }
+        .card.locked { opacity: 0.3; filter: blur(10px); transform: scale(0.96); }
+        .card.revealed { opacity: 1 !important; filter: none !important; transform: scale(1) !important; z-index: 10; border-color: var(--ios-pink); }
         
-        /* ПРОШЕДШИЕ ПАРЫ */
-        .lesson-card.done {
-            opacity: 0.3;
-            filter: grayscale(1);
+        body.hide-locked .card.locked:not(.revealed) { display: none; }
+
+        .card.is-live { border-color: var(--ios-pink); box-shadow: 0 0 40px rgba(255, 45, 85, 0.35); }
+        .card.is-passed { opacity: 0.3; filter: grayscale(1) blur(2px); }
+
+        .time-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .time-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+
+        .badge { font-size: 10px; font-weight: 900; padding: 6px 12px; border-radius: 12px; text-transform: uppercase; border: 1px solid transparent; }
+        .badge-live { background: var(--ios-pink); color: white; animation: pulse 1.5s infinite; box-shadow: 0 0 15px rgba(255, 45, 85, 0.5); }
+        .badge-timer { background: rgba(48, 209, 88, 0.1); color: var(--ios-green); border-color: var(--ios-green); }
+        .badge-passed { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
+        .badge-locked { background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.2); }
+
+        .main-info { display: flex; gap: 18px; align-items: center; }
+        .icon-box {
+            width: 60px; height: 60px; border-radius: 20px;
+            background: linear-gradient(145deg, #ff2d55, #b01a38);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; flex-shrink: 0; 
+            box-shadow: 0 10px 25px rgba(255, 45, 85, 0.4);
         }
 
-        .lesson-time { font-family: 'Courier New', monospace; font-weight: 700; font-size: 1.1rem; }
-        .lesson-name { font-weight: 700; margin: 10px 0; display: block; }
-        
-        .lesson-footer {
-            display: flex; gap: 15px; font-size: 0.8rem; color: var(--text-gray);
-            border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px;
+        .details h3 { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
+        .details p { margin: 0; font-size: 13px; color: var(--text-secondary); font-weight: 600; line-height: 1.4; }
+        .room { color: var(--ios-pink); font-weight: 800; text-shadow: 0 0 8px rgba(255, 45, 85, 0.3); }
+
+        .eye-toggle-card {
+            position: absolute; right: 15px; top: 15px; z-index: 100;
+            background: rgba(255,255,255,0.2); width: 42px; height: 42px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
-        .tag {
-            font-size: 0.6rem; font-weight: 900; text-transform: uppercase;
-            padding: 3px 8px; border-radius: 5px; margin-bottom: 10px; display: inline-block;
-        }
-        .tag-active { background: var(--accent-main); color: white; }
-        .tag-waiting { background: var(--accent-future); color: white; }
-
-        .eye-btn {
-            position: absolute; right: 20px; top: 20px;
-            background: none; border: none; color: var(--text-gray);
-            font-size: 1.2rem; cursor: pointer;
-        }
-
-        .restore-btn {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #fff; color: #000; border: none;
-            padding: 12px 25px; border-radius: 50px;
-            font-weight: 800; font-size: 0.8rem; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 999;
-        }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
 
+<div class="bg-glow"></div>
+
 <header>
-    <h1>Группа 10.2-511</h1>
-    <div class="sub-header">Сюмбелька любимая моя давай давай</div>
+    <div class="header-top">
+        <div>
+            <div class="date-label" id="realDate">---</div>
+            <h1>Дневник Любимой</h1>
+        </div>
+        <div class="view-controls">
+            <button class="view-btn active" id="btnShowAll" onclick="setViewMode('all')">👁️</button>
+            <button class="view-btn" id="btnHideLocked" onclick="setViewMode('clean')">🙈</button>
+        </div>
+    </div>
+    <div class="week-nav">
+        <button class="nav-btn" onclick="changeWeek(-1)">-</button>
+        <div class="week-info">
+            <span class="week-label" id="weekType">Текущая неделя</span>
+            <span class="week-num" id="weekNumDisplay">1</span>
+        </div>
+        <button class="nav-btn" onclick="changeWeek(1)">+</button>
+    </div>
 </header>
 
-<div class="week-nav">
-    <button class="circle-btn" onclick="changeWeek(-1)">←</button>
-    <div class="week-info">
-        <span class="week-num" id="weekNum">1</span>
-        <span class="week-text">Неделя</span>
-    </div>
-    <button class="circle-btn" onclick="changeWeek(1)">→</button>
-</div>
-
-<div class="main-container" id="schedule-box"></div>
-<button id="restoreBtn" class="restore-btn" style="display:none;" onclick="restoreHidden()">ПОКАЗАТЬ СКРЫТЫЕ</button>
+<div class="container" id="scheduleRoot"></div>
 
 <script>
-    const START_DATE = new Date('2026-02-09');
-    let hiddenIds = JSON.parse(localStorage.getItem('hidden_v7') || '[]');
-
+    const START_DATE = new Date('2026-02-09T00:00:00');
+    
     const schedule = [
-        // Понедельник
-        { day: "Понедельник", time: "10:10 - 11:40", subject: "Татарский Язык", teacher: "Сибгаева Ф.Р.", room: "258, 262, 263", weeks: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
-        // Вторник
-        { day: "Вторник", time: "08:00 - 09:30", subject: "Физическая Культура", teacher: "Шалавина А.С.", room: "с/к Москва", weeks: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] },
-        { day: "Вторник", time: "10:10 - 11:40", subject: "Основы композиции и дизайна в рекламе", teacher: "Кринская З.А.", room: "207", weeks: [1,2,3,4,5,6,7] },
-        { day: "Вторник", time: "10:10 - 11:40", subject: "Основы Графического искусства", teacher: "Шайхутдинова А.Р.", room: "171", weeks: [8,9,10,11,12,13,14] },
-        // Среда
-        { day: "Среда", time: "08:30 - 10:00", subject: "История России", teacher: "Саматова Ч.Х.", room: "355 акт.зал", weeks: [1,2,3,4,5,6,7,8] },
-        { day: "Среда", time: "08:30 - 10:00", subject: "Профессионально-ознакомительная практика", teacher: "Аниферова В.В.", room: "444", weeks: [9,10,11,12,13,14,15,16,17] },
-        { day: "Среда", time: "10:10 - 11:40", subject: "История России", teacher: "Саматова Ч.Х.", room: "355 акт.зал", weeks: [1,2,3,4,5,6,7,8,9] },
-        { day: "Среда", time: "10:10 - 11:40", subject: "Проф. Ознакомительная практика", teacher: "Аниферова В.В.", room: "429", weeks: [10,11,12,13,14,15,16,17] },
-        { day: "Среда", time: "12:10 - 13:40", subject: "Язык и стиль современных СМИ", teacher: "Аниферова В.В.", room: "473", weeks: [8,9,10,11,12,13,14] },
-        { day: "Среда", time: "13:50 - 15:20", subject: "Технологии рекламного производства", teacher: "Шайхутдинов Т.М.", room: "---", weeks: [1,2] },
-        { day: "Среда", time: "13:50 - 15:20", subject: "Информационные технологии", teacher: "Алехандро", room: "473", weeks: [11,12,13,14,15,16,17] },
-        { day: "Среда", time: "17:30 - 19:00", subject: "Технология рекламного производства", teacher: "Шайхутдинов Т.М.", room: "346", weeks: [9,10,11,12,13,14] },
-        { day: "Среда", time: "19:10 - 20:40", subject: "Практикум по созданию видеоконтента", teacher: "Ямщиков И.В.", room: "210/475", weeks: [9,10,11,12,13,14,15,16] },
-        // Четверг
-        { day: "Четверг", time: "08:30 - 10:00", subject: "Основы компьютерной графики", teacher: "Шамсутдинов Р.Н.", room: "475", weeks: Array.from({length:17}, (_,i)=>i+1) },
-        { day: "Четверг", time: "10:10 - 11:40", subject: "Теория и практика PR", teacher: "Сафина Л.Н.", room: "239", weeks: [1,2,3,4,5,6,7,8,9,10,11,12,13] },
-        { day: "Четверг", time: "10:10 - 11:40", subject: "Теория и практика PR", teacher: "Сафина Л.Н.", room: "239", weeks: [14,15,16,17] },
-        { day: "Четверг", time: "12:10 - 13:40", subject: "Основы компьютерной графики", teacher: "Шамсутдинов Р.Н.", room: "473", weeks: [11,12,13,14] },
-        { day: "Четверг", time: "13:50 - 15:20", subject: "Эстетика медиа коммуникаций", teacher: "Ахметшина Э.Г.", room: "346/210", weeks: [3,4,5,6,7,8,9,10,11,14,15,16,17] },
-        { day: "Четверг", time: "15:50 - 17:20", subject: "Язык и стиль современных СМИ", teacher: "Аниферова В.В.", room: "207", weeks: [1,2,3,4,5] },
-        { day: "Четверг", time: "17:30 - 19:00", subject: "Эстетика / Язык СМИ", teacher: "Ахметшина / Аниферова", room: "210, 207", weeks: [3,4,5,6,7,10,11,12,13,14,15] },
-        { day: "Четверг", time: "19:10 - 20:40", subject: "Профессионально-ознакомительная практика", teacher: "Аниферова В.В.", room: "256", weeks: [1,2,3,4,5,6,7,8,9] },
-        // Пятница
-        { day: "Пятница", time: "08:00 - 09:30", subject: "Физическая культура", teacher: "Шалавина А.С.", room: "с/к Москва", weeks: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16] },
-        { day: "Пятница", time: "10:10 - 11:40", subject: "Основы графической бренд-коммуникации", teacher: "Мишалина М.А.", room: "444", weeks: [1,2,3,4,5,6,7] },
-        { day: "Пятница", time: "12:10 - 13:40", subject: "Типографика и шрифт в рекламе", teacher: "Сафина Э.С.", room: "464, 476", weeks: [1,2,3,4,5,6,7] },
-        { day: "Пятница", time: "17:30 - 19:10", subject: "История России", teacher: "Кисиленко А.О.", room: "263", weeks: [1,2,3,4,5,6,7,8,9,10,11,12] }
+        { d: 1, t: "10:10 - 11:40", s: "Татарский Язык", r: "258, 262, 263", p: "Сибгаева / Набиуллина", w: [1,15], i: "🕌" },
+        { d: 1, t: "10:10 - 11:40", s: "Осн. композиции и дизайна", r: "262", p: "Кринская З.А.", w: [16,17], i: "📐" },
+        { d: 2, t: "08:00 - 09:30", s: "Физическая Культура", r: "СК Москва", p: "Шалавина А.С.", w: [1,16], i: "👟" },
+        { d: 2, t: "10:10 - 11:40", s: "Комп. и дизайн в рекламе", r: "207", p: "Кринская З.А.", w: [1,7], i: "🎨" },
+        { d: 2, t: "10:10 - 11:40", s: "Графическое искусство", r: "171", p: "Шайхутдинова А.Р.", w: [8,14], i: "✒️" },
+        { d: 3, t: "08:30 - 10:00", s: "История России", r: "355 акт.зал", p: "Саматова Ч.Х.", w: [1,8], i: "📜" },
+        { d: 3, t: "08:30 - 10:00", s: "Проф. практика", r: "444", p: "Аниферова В.В.", w: [9,17], i: "💼" },
+        { d: 3, t: "10:10 - 11:40", s: "История России", r: "355 акт.зал", p: "Саматова Ч.Х.", w: [1,9], i: "🇷🇺" },
+        { d: 3, t: "10:10 - 11:40", s: "Проф. практика", r: "429", p: "Аниферова В.В.", w: [10,17], i: "📂" },
+        { d: 3, t: "12:10 - 13:40", s: "Язык и стиль СМИ", r: "473", p: "Аниферова В.В.", w: [8,14], i: "✍️" },
+        { d: 3, t: "13:50 - 15:20", s: "Технологии рекламного пр-ва", r: "239", p: "Шайхутдинов Т.М.", w: [1,2], i: "🎬" },
+        { d: 3, t: "13:50 - 15:20", s: "Информационные технологии", r: "473", p: "Алехандро", w: [11,17], i: "💻" },
+        { d: 3, t: "17:30 - 19:00", s: "Технология произв.", r: "346", p: "Шайхутдинов Т.М.", w: [9,14], i: "🎥" },
+        { d: 3, t: "19:10 - 20:40", s: "Видеоконтент (Практикум)", r: "210 / 475", p: "Ямщиков И.В.", w: [9,16], i: "🎞️" },
+        { d: 4, t: "08:30 - 10:00", s: "Компьютерная графика", r: "475", p: "Шамсутдинов Р.Н.", w: [1,17], i: "🖥️" },
+        { d: 4, t: "10:10 - 11:40", s: "PR и коммуникации", r: "239", p: "Сафина Л.Н.", w: [1,17], i: "📢" },
+        { d: 4, t: "12:10 - 13:40", s: "Компьютерная графика", r: "473", p: "Шамсутдинов Р.Н.", w: [11,14], i: "🖱️" },
+        { d: 4, t: "13:50 - 15:20", s: "Эстетика медиа", r: "346/210", p: "Ахметшина Э.Г.", w: [3,17], i: "🎭" },
+        { d: 4, t: "15:50 - 17:20", s: "Язык и стиль СМИ", r: "207", p: "Аниферова В.В.", w: [1,5], i: "🖋️" },
+        { d: 4, t: "17:30 - 19:00", s: "Эстетика Медиа Комм.", r: "210", p: "Ахметшина Э.Г.", w: [3,7], i: "💡" },
+        { d: 4, t: "17:30 - 19:00", s: "Язык СМИ", r: "207", p: "Аниферова В.В.", w: [10,15], i: "📰" },
+        { d: 4, t: "19:10 - 20:40", s: "Проф. практика", r: "256", p: "Аниферова В.В.", w: [1,9], i: "💼" },
+        { d: 5, t: "08:00 - 09:30", s: "Физическая Культура", r: "СК Москва", p: "Шалавина А.С.", w: [1,16], i: "👟" },
+        { d: 5, t: "10:10 - 11:40", s: "Бренд-коммуникации", r: "444", p: "Мишалина М.А.", w: [1,17], i: "💎" },
+        { d: 5, t: "12:10 - 13:40", s: "Типографика и шрифт", r: "464 (с 11н: 476)", p: "Сафина Э.С.", w: [1,17], i: "🎨" },
+        { d: 5, t: "17:30 - 19:10", s: "История России", r: "263", p: "Кисиленко А.О.", w: [1,12], i: "🏛️" },
+        { d: 6, t: "08:30 - 10:00", s: "ЦОР Типографика", r: "464", p: "Сафина Э.С.", w: [1,5], i: "💻" },
+        { d: 6, t: "08:30 - 10:00", s: "Английский Язык", r: "465", p: "Бурлакова Э.В.", w: [17,17], i: "🇬🇧" },
+        { d: 6, t: "12:10 - 13:40", s: "Иностранный Язык", r: "464/475/476", p: "Бурлакова / Планкина", w: [1,17], i: "🌍" },
+        { d: 6, t: "13:50 - 15:20", s: "Живопись", r: "171", p: "Сафина", w: [3,9], i: "🖼️" },
+        { d: 6, t: "13:50 - 15:20", s: "Филол. Брендинг", r: "239", p: "Благодарова О.А.", w: [10,14], i: "📚" },
+        { d: 6, t: "15:50 - 17:20", s: "Филология Брендинга", r: "239", p: "Благодарова О.А.", w: [10,13], i: "📖" },
+        { d: 6, t: "17:30 - 19:00", s: "Филология Брендинга", r: "239", p: "Благодарова о.а.", w: [1,9], i: "✒️" },
+        { d: 6, t: "17:30 - 19:00", s: "Инфотех", r: "473", p: "Алехандро", w: [10,17], i: "📱" },
+        { d: 6, t: "19:10 - 20:40", s: "Инфотех (ЦОР)", r: "Онлайн", p: "Алехандро", w: [1,3], i: "☁️" }
     ];
 
-    let currentWeek = Math.floor((new Date() - START_DATE) / (1000 * 60 * 60 * 24 * 7)) + 1;
-    if (currentWeek < 1) currentWeek = 1; if (currentWeek > 18) currentWeek = 18;
+    let realWeek = Math.floor((new Date() - START_DATE) / (1000 * 60 * 60 * 24 * 7)) + 1;
+    let currentWeek = Math.max(1, Math.min(22, realWeek));
 
-    function changeWeek(delta) {
-        currentWeek = Math.max(1, Math.min(18, currentWeek + delta));
-        render();
+    function setViewMode(mode) {
+        if (mode === 'clean') {
+            document.body.classList.add('hide-locked');
+            document.getElementById('btnHideLocked').classList.add('active');
+            document.getElementById('btnShowAll').classList.remove('active');
+        } else {
+            document.body.classList.remove('hide-locked');
+            document.getElementById('btnShowAll').classList.add('active');
+            document.getElementById('btnHideLocked').classList.remove('active');
+        }
     }
 
-    function toggleHide(id) {
-        if (hiddenIds.includes(id)) hiddenIds = hiddenIds.filter(i => i !== id);
-        else hiddenIds.push(id);
-        localStorage.setItem('hidden_v7', JSON.stringify(hiddenIds));
-        render();
+    function changeWeek(v) { 
+        currentWeek = Math.max(1, Math.min(22, currentWeek + v)); 
+        render(); 
     }
 
-    function restoreHidden() {
-        hiddenIds = [];
-        localStorage.removeItem('hidden_v7');
-        render();
+    function getSmartStatus(l, selWeek) {
+        const now = new Date();
+        const curDay = now.getDay() === 0 ? 7 : now.getDay();
+        const [sh, sm] = l.t.split(' - ')[0].split(':').map(Number);
+        const [eh, em] = l.t.split(' - ')[1].split(':').map(Number);
+
+        if (selWeek < l.w[0]) return { label: `Через ${l.w[0] - selWeek} нед.`, class: "badge-locked", type: 'locked' };
+        if (selWeek > l.w[1]) return { label: "Прошла", class: "badge-passed", type: 'passed' };
+        if (selWeek < realWeek) return { label: "Прошла", class: "badge-passed", type: 'passed' };
+        if (selWeek > realWeek) return { label: "Будет", class: "badge-locked", type: 'future' };
+
+        const st = new Date(now); st.setHours(sh, sm, 0);
+        const et = new Date(now); et.setHours(eh, em, 0);
+
+        if (curDay > l.d || (curDay === l.d && now > et)) return { label: "Прошла", class: "badge-passed", type: 'passed' };
+        if (curDay === l.d && now >= st && now <= et) return { label: "СЕЙЧАС ИДЕТ", class: "badge-live", type: 'live' };
+        if (curDay === l.d && now < st) {
+            const diff = st - now;
+            const h = Math.floor(diff/3600000);
+            const m = Math.floor((diff%3600000)/60000);
+            return { label: `Через ${h}ч ${m}м`, class: "badge-timer", type: 'timer' };
+        }
+        return { label: `Через ${l.d - curDay} дн.`, class: "badge-timer", type: 'upcoming' };
     }
 
     function render() {
-        document.getElementById('weekNum').innerText = currentWeek;
-        const box = document.getElementById('schedule-box');
-        box.innerHTML = "";
+        const root = document.getElementById('scheduleRoot');
+        document.getElementById('weekNumDisplay').innerText = currentWeek;
+        document.getElementById('weekType').innerText = (currentWeek === realWeek) ? "Текущая неделя" : "Выбранная неделя";
+        
+        root.innerHTML = "";
+        const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
 
-        const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница"];
-
-        days.forEach(day => {
-            const lessons = schedule.filter(l => l.day === day);
+        days.forEach((name, idx) => {
+            const items = schedule.filter(l => l.d === idx + 1);
+            if(items.length === 0) return;
             const section = document.createElement('div');
             section.className = 'day-section';
-            section.innerHTML = `<div class="day-title">${day}</div>`;
-
-            let hasContent = false;
-            lessons.forEach(l => {
-                const start = Math.min(...l.weeks);
-                const end = Math.max(...l.weeks);
-                const id = `${l.day}-${l.time}-${l.subject}-${start}`;
-
-                if (hiddenIds.includes(id)) return;
-                hasContent = true;
-
-                const isActive = l.weeks.includes(currentWeek);
-                const isWaiting = currentWeek < start;
-                const isDone = currentWeek > end;
-
+            section.innerHTML = `<div class="day-title">${name}</div>`;
+            items.forEach((l, i) => {
+                const status = getSmartStatus(l, currentWeek);
+                const id = `card-${idx}-${i}`;
+                const isLocked = status.type === 'locked';
                 const card = document.createElement('div');
-                card.className = `lesson-card ${isActive ? 'active' : (isWaiting ? 'waiting' : 'done')}`;
-
-                let statusTag = isActive ? '<span class="tag tag-active">На этой неделе</span>' : 
-                               (isWaiting ? `<span class="tag tag-waiting">С ${start} недели</span>` : '<span class="tag">Завершено</span>');
-
+                card.id = id;
+                card.className = `card ${isLocked ? 'locked' : ''} ${status.type === 'live' ? 'is-live' : ''} ${status.type === 'passed' ? 'is-passed' : ''}`;
                 card.innerHTML = `
-                    <button class="eye-btn" onclick="toggleHide('${id}')">👁</button>
-                    ${statusTag}
-                    <div class="lesson-time">${l.time}</div>
-                    <span class="lesson-name">${l.subject}</span>
-                    <div class="lesson-footer">
-                        <span>📍 ${l.room}</span>
-                        <span>👤 ${l.teacher.split(' ')[0]}</span>
-                    </div>
-                `;
+                    ${isLocked ? `<div class="eye-toggle-card" onclick="document.getElementById('${id}').classList.toggle('revealed')">👁️</div>` : ''}
+                    <div class="time-row"><span class="time-text">${l.t}</span><span class="badge ${status.class}">${status.label}</span></div>
+                    <div class="main-info"><div class="icon-box">${l.i}</div><div class="details"><h3>${l.s}</h3><p>📍 <span class="room">${l.r}</span><br>👤 ${l.p}</p></div></div>`;
                 section.appendChild(card);
             });
-
-            if (hasContent) box.appendChild(section);
+            root.appendChild(section);
         });
-
-        document.getElementById('restoreBtn').style.display = hiddenIds.length ? 'block' : 'none';
+        document.getElementById('realDate').innerText = new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
     }
 
     render();
+    setInterval(render, 30000);
 </script>
 </body>
 </html>
