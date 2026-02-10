@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Сюмбелька пупсик</title>
+    <title>Любимая</title>
     <style>
         :root {
             --ios-bg: #000000;
-            --ios-card: rgba(20, 20, 22, 0.8);
-            --ios-accent: #ff2d55;
+            --ios-card: rgba(22, 22, 24, 0.6);
             --ios-pink: #ff375f;
             --ios-blue: #007aff;
             --ios-green: #30d158;
             --text-main: #ffffff;
             --text-secondary: #a1a1a6;
-            --blur-val: blur(10px); 
+            --island-bg: rgba(255, 255, 255, 0.03); 
+            --island-blur: blur(50px);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -31,132 +31,130 @@
         .bg-glow {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: 
-                radial-gradient(circle at 0% 0%, rgba(255, 45, 85, 0.35) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(0, 122, 255, 0.3) 0%, transparent 50%);
+                radial-gradient(circle at 10% 10%, rgba(255, 45, 85, 0.45) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(0, 122, 255, 0.35) 0%, transparent 40%),
+                #000;
             z-index: -1;
-            filter: contrast(1.2);
         }
 
-        header {
-            padding: 65px 20px 25px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(0,0,0,0.7);
+        .header-islands {
             position: sticky; top: 0; z-index: 1000;
-            border-bottom: 0.5px solid rgba(255,255,255,0.15);
+            padding: 50px 16px 15px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
         }
 
-        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .date-label { color: var(--ios-pink); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; text-shadow: 0 0 10px rgba(255, 55, 95, 0.5); }
-        h1 { margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1.5px; }
-
-        .view-controls {
-            display: flex; background: rgba(255,255,255,0.12); 
-            padding: 4px; border-radius: 14px; gap: 4px;
+        .island {
+            background: var(--island-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: var(--island-blur);
+            -webkit-backdrop-filter: var(--island-blur);
+            border-radius: 22px;
+            display: flex; align-items: center;
         }
+
+        .island-date { padding: 12px 18px; flex-direction: column; align-items: flex-start; }
+        .date-text { 
+            font-size: 11px; font-weight: 800; color: var(--ios-pink); 
+            text-transform: uppercase; letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 55, 95, 0.8);
+        }
+        .month-text { font-size: 19px; font-weight: 900; }
+
+        .island-controls { padding: 6px; gap: 6px; }
         .view-btn {
-            border: none; background: transparent; color: var(--text-secondary);
-            width: 44px; height: 36px; border-radius: 11px;
+            border: none; background: rgba(255,255,255,0.05); color: var(--text-secondary);
+            width: 44px; height: 44px; border-radius: 16px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 18px; transition: all 0.3s ease;
+            font-size: 20px; transition: 0.3s;
         }
-        .view-btn.active {
-            background: var(--ios-pink); color: white;
-            box-shadow: 0 0 15px rgba(255, 45, 85, 0.6);
-        }
+        .view-btn.active { color: #fff; background: var(--ios-pink); box-shadow: 0 0 20px rgba(255, 45, 85, 0.5); }
 
-        .week-nav { 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: rgba(255,255,255,0.08); padding: 12px 20px; border-radius: 20px;
-            border: 0.5px solid rgba(255,255,255,0.1);
-        }
-        .nav-btn { 
-            background: white; border: none; color: black; 
-            width: 32px; height: 32px; border-radius: 50%; 
-            font-size: 18px; font-weight: 900; box-shadow: 0 0 10px rgba(255,255,255,0.3);
-        }
-        .week-info { text-align: center; }
-        .week-num { font-size: 24px; font-weight: 900; display: block; line-height: 1; color: #fff; }
-        .week-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; }
+        .island-week { grid-column: 1 / span 2; justify-content: space-between; padding: 10px 15px; }
+        .nav-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; font-weight: 900; }
+        .week-num { font-size: 22px; font-weight: 900; }
 
-        .container { padding: 25px 16px 150px; max-width: 600px; margin: 0 auto; }
-        .day-section { margin-bottom: 40px; }
-        .day-title { font-size: 26px; font-weight: 900; margin-bottom: 18px; color: #fff; text-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .container { padding: 10px 16px 150px; max-width: 600px; margin: 0 auto; }
+        .day-title { font-size: 26px; font-weight: 900; margin: 30px 0 15px 5px; }
 
         .card {
             background: var(--ios-card);
-            border-radius: 30px; padding: 22px; margin-bottom: 16px;
+            border-radius: 30px; padding: 22px; margin-bottom: 18px;
             border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
             position: relative; overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.4s ease;
         }
 
-        .card.locked { opacity: 0.3; filter: blur(10px); transform: scale(0.96); }
-        .card.revealed { opacity: 1 !important; filter: none !important; transform: scale(1) !important; z-index: 10; border-color: var(--ios-pink); }
+
+        .card.locked { opacity: 0.2; filter: blur(25px); transform: scale(0.96); }
+        .card.revealed { opacity: 1 !important; filter: none !important; transform: scale(1) !important; border-color: var(--ios-pink); }
         
         body.hide-locked .card.locked:not(.revealed) { display: none; }
 
-        .card.is-live { border-color: var(--ios-pink); box-shadow: 0 0 40px rgba(255, 45, 85, 0.35); }
-        .card.is-passed { opacity: 0.3; filter: grayscale(1) blur(2px); }
 
-        .time-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .time-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .card.is-passed { opacity: 0.4; filter: grayscale(0.9) blur(1px); }
 
-        .badge { font-size: 10px; font-weight: 900; padding: 6px 12px; border-radius: 12px; text-transform: uppercase; border: 1px solid transparent; }
-        .badge-live { background: var(--ios-pink); color: white; animation: pulse 1.5s infinite; box-shadow: 0 0 15px rgba(255, 45, 85, 0.5); }
-        .badge-timer { background: rgba(48, 209, 88, 0.1); color: var(--ios-green); border-color: var(--ios-green); }
-        .badge-passed { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
-        .badge-locked { background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.2); }
-
-        .main-info { display: flex; gap: 18px; align-items: center; }
         .icon-box {
             width: 60px; height: 60px; border-radius: 20px;
             background: linear-gradient(145deg, #ff2d55, #b01a38);
             display: flex; align-items: center; justify-content: center;
-            font-size: 28px; flex-shrink: 0; 
-            box-shadow: 0 10px 25px rgba(255, 45, 85, 0.4);
+            font-size: 28px; flex-shrink: 0;
+            box-shadow: 0 0 25px rgba(255, 45, 85, 0.5);
         }
 
-        .details h3 { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
-        .details p { margin: 0; font-size: 13px; color: var(--text-secondary); font-weight: 600; line-height: 1.4; }
-        .room { color: var(--ios-pink); font-weight: 800; text-shadow: 0 0 8px rgba(255, 45, 85, 0.3); }
+
+        .badge { 
+            font-size: 10px; font-weight: 900; padding: 6px 12px; 
+            border-radius: 12px; text-transform: uppercase; border: 1px solid transparent; 
+        }
+        .badge-live { background: var(--ios-pink); color: white; animation: pulse 1.5s infinite; box-shadow: 0 0 15px rgba(255, 45, 85, 0.5); }
+        .badge-timer { background: rgba(48, 209, 88, 0.1); color: var(--ios-green); border: 1px solid var(--ios-green); }
+        .badge-passed { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
+        .badge-locked { background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+
+        .time-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .time-text { font-size: 20px; font-weight: 800; }
+        .details h3 { margin: 0; font-size: 19px; font-weight: 800; }
+        .details p { margin: 0; font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-top: 4px; }
+        .room { color: var(--ios-pink); font-weight: 800; }
 
         .eye-toggle-card {
             position: absolute; right: 15px; top: 15px; z-index: 100;
-            background: rgba(255,255,255,0.2); width: 42px; height: 42px;
+            background: rgba(255,255,255,0.15); width: 40px; height: 40px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
 </head>
 <body>
 
 <div class="bg-glow"></div>
 
-<header>
-    <div class="header-top">
-        <div>
-            <div class="date-label" id="realDate">---</div>
-            <h1>Дневник Любимой</h1>
-        </div>
-        <div class="view-controls">
-            <button class="view-btn active" id="btnShowAll" onclick="setViewMode('all')">👁️</button>
-            <button class="view-btn" id="btnHideLocked" onclick="setViewMode('clean')">🙈</button>
-        </div>
+<div class="header-islands">
+    <div class="island island-date">
+        <span class="date-text" id="islandDay">---</span>
+        <span class="month-text" id="islandDate">---</span>
     </div>
-    <div class="week-nav">
+
+    <div class="island island-controls">
+        <button class="view-btn active" id="btnShowAll" onclick="setViewMode('all')">👁️</button>
+        <button class="view-btn" id="btnHideLocked" onclick="setViewMode('clean')">🙈</button>
+    </div>
+
+    <div class="island island-week">
         <button class="nav-btn" onclick="changeWeek(-1)">-</button>
-        <div class="week-info">
-            <span class="week-label" id="weekType">Текущая неделя</span>
-            <span class="week-num" id="weekNumDisplay">1</span>
+        <div class="week-info" style="text-align: center;">
+            <span style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; font-weight:700;" id="weekType">---</span>
+            <span class="week-num" id="weekNumDisplay" style="display:block;">1</span>
         </div>
         <button class="nav-btn" onclick="changeWeek(1)">+</button>
     </div>
-</header>
+</div>
 
 <div class="container" id="scheduleRoot"></div>
 
@@ -227,16 +225,25 @@
         const [sh, sm] = l.t.split(' - ')[0].split(':').map(Number);
         const [eh, em] = l.t.split(' - ')[1].split(':').map(Number);
 
-        if (selWeek < l.w[0]) return { label: `Через ${l.w[0] - selWeek} нед.`, class: "badge-locked", type: 'locked' };
-        if (selWeek > l.w[1]) return { label: "Прошла", class: "badge-passed", type: 'passed' };
-        if (selWeek < realWeek) return { label: "Прошла", class: "badge-passed", type: 'passed' };
-        if (selWeek > realWeek) return { label: "Будет", class: "badge-locked", type: 'future' };
+
+        if (selWeek < l.w[0] || selWeek > l.w[1]) {
+            return { label: `Неделя ${l.w[0]}-${l.w[1]}`, class: "badge-locked", type: 'locked' };
+        }
+
+        if (selWeek > realWeek) {
+            return { label: "Будет", class: "badge-timer", type: 'future' };
+        }
+
+        if (selWeek < realWeek) {
+            return { label: "Прошла", class: "badge-passed", type: 'passed' };
+        }
 
         const st = new Date(now); st.setHours(sh, sm, 0);
         const et = new Date(now); et.setHours(eh, em, 0);
 
         if (curDay > l.d || (curDay === l.d && now > et)) return { label: "Прошла", class: "badge-passed", type: 'passed' };
         if (curDay === l.d && now >= st && now <= et) return { label: "СЕЙЧАС ИДЕТ", class: "badge-live", type: 'live' };
+        
         if (curDay === l.d && now < st) {
             const diff = st - now;
             const h = Math.floor(diff/3600000);
@@ -251,6 +258,10 @@
         document.getElementById('weekNumDisplay').innerText = currentWeek;
         document.getElementById('weekType').innerText = (currentWeek === realWeek) ? "Текущая неделя" : "Выбранная неделя";
         
+        const now = new Date();
+        document.getElementById('islandDay').innerText = now.toLocaleDateString('ru-RU', { weekday: 'long' });
+        document.getElementById('islandDate').innerText = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+
         root.innerHTML = "";
         const days = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
 
@@ -260,6 +271,7 @@
             const section = document.createElement('div');
             section.className = 'day-section';
             section.innerHTML = `<div class="day-title">${name}</div>`;
+            
             items.forEach((l, i) => {
                 const status = getSmartStatus(l, currentWeek);
                 const id = `card-${idx}-${i}`;
@@ -268,14 +280,16 @@
                 card.id = id;
                 card.className = `card ${isLocked ? 'locked' : ''} ${status.type === 'live' ? 'is-live' : ''} ${status.type === 'passed' ? 'is-passed' : ''}`;
                 card.innerHTML = `
-                    ${isLocked ? `<div class="eye-toggle-card" onclick="document.getElementById('${id}').classList.toggle('revealed')">👁️</div>` : ''}
+                    ${isLocked ? `<div class="eye-toggle-card" onclick="event.stopPropagation(); document.getElementById('${id}').classList.toggle('revealed')">👁️</div>` : ''}
                     <div class="time-row"><span class="time-text">${l.t}</span><span class="badge ${status.class}">${status.label}</span></div>
-                    <div class="main-info"><div class="icon-box">${l.i}</div><div class="details"><h3>${l.s}</h3><p>📍 <span class="room">${l.r}</span><br>👤 ${l.p}</p></div></div>`;
+                    <div class="main-info" style="display:flex; gap:15px; align-items:center;">
+                        <div class="icon-box">${l.i}</div>
+                        <div class="details"><h3>${l.s}</h3><p>📍 <span class="room">${l.r}</span><br>👤 ${l.p}</p></div>
+                    </div>`;
                 section.appendChild(card);
             });
             root.appendChild(section);
         });
-        document.getElementById('realDate').innerText = new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
     }
 
     render();
@@ -283,4 +297,3 @@
 </script>
 </body>
 </html>
-
