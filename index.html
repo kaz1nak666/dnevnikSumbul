@@ -111,14 +111,14 @@
 </div>
 
 <div class="theme-menu" id="themeMenu">
-    <div style="text-align:center; font-weight:900; font-size: 20px; margin-bottom:30px;">DESIGN CENTER</div>
-    <span class="label-theme">ВЕРХНИЙ ЛЕВЫЙ УГОЛ (GLOW 1)</span>
+    <div style="text-align:center; font-weight:900; font-size: 20px; margin-bottom:30px;">Режим Дизайнера</div>
+    <span class="label-theme">ВЕРХНИЙ ЛЕВЫЙ УГОЛ</span>
     <div class="color-row" id="rowGlow1"></div>
-    <span class="label-theme">НИЖНИЙ ПРАВЫЙ УГОЛ (GLOW 2)</span>
+    <span class="label-theme">НИЖНИЙ ПРАВЫЙ УГОЛ</span>
     <div class="color-row" id="rowGlow2"></div>
     <span class="label-theme">ЦВЕТ ИКОНОК, ГЛАЗИКОВ И ТЕКСТА</span>
     <div class="color-row" id="rowIconGlow"></div>
-    <span class="label-theme">ПРОЗРАЧНОСТЬ СТЕКЛА</span>
+    <span class="label-theme">ПРОЗРАЧНОСТЬ БЛОКОВ РАСПИСАНИЯ</span>
     <input type="range" min="1" max="40" id="glassSlider" style="width:100%; accent-color:var(--ios-pink);" oninput="updateOpacity(this.value)">
     <button onclick="toggleMenu()" style="width:100%; margin-top:30px; background:var(--ios-pink); border:none; color:#fff; padding:18px; border-radius:20px; font-weight:800;">ПРИМЕНИТЬ</button>
 </div>
@@ -126,7 +126,7 @@
 <div class="game-overlay" id="gameOverlay">
     <div class="game-card">
         <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-weight:900; align-items:center;">
-            <span id="artName">ART: PIXEL</span>
+            <span id="artName">ART: HEART</span>
             <span id="artPercent" style="color:var(--ios-pink); font-size:12px;">0%</span>
         </div>
         <div class="game-progress-container"><div class="game-progress-fill" id="gameBar"></div></div>
@@ -213,7 +213,7 @@
     ];
 
     let currentArtIdx = 0;
-    let selectedColorIdx = null; // ЧИНИМ: По умолчанию цвет не выбран
+    let selectedColorIdx = null; 
     let artProgress = JSON.parse(localStorage.getItem('sumbul_art')) || {};
 
     function openResetModal() { document.getElementById('customModal').style.display = 'flex'; }
@@ -235,7 +235,7 @@
                 else { 
                     pixel.innerText = val; 
                     pixel.onclick = () => { 
-                        // ЧИНИМ: Красим только если выбран ПРАВИЛЬНЫЙ цвет в палитре
+                        
                         if (selectedColorIdx !== null && selectedColorIdx + 1 === val) {
                             artProgress[pKey] = true; 
                             localStorage.setItem('sumbul_art', JSON.stringify(artProgress)); 
@@ -258,7 +258,7 @@
             item.className = `pal-item ${selectedColorIdx === idx ? 'active' : ''}`;
             item.style.background = color; item.innerText = idx + 1;
             item.style.color = (color === '#ffffff' || color === '#ffcc00') ? '#000' : '#fff';
-            item.onclick = () => { selectedColorIdx = idx; initGame(); }; // Выбор цвета
+            item.onclick = () => { selectedColorIdx = idx; initGame(); }; 
             pal.appendChild(item);
         });
     }
@@ -309,7 +309,7 @@
         else if(type === 'glow2') document.documentElement.style.setProperty('--glow-2', color + '59');
         else if(type === 'icon') {
             document.documentElement.style.setProperty('--icon-main-color', color);
-            const glowHex = (color === '#000000') ? '#ffffff33' : color + '99'; // УСИЛИЛ: Сделал свечение плотнее
+            const glowHex = (color === '#000000') ? '#ffffff33' : color + '99'; 
             document.documentElement.style.setProperty('--icon-glow', glowHex);
         }
         saveTheme();
