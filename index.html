@@ -24,7 +24,6 @@
             --glow-2: rgba(0, 122, 255, 0.35);
             --glass-opacity: 0.03;
             
-
             --icon-main-color: #ff375f; 
             --icon-glow: rgba(255, 55, 95, 0.6); 
         }
@@ -34,20 +33,39 @@
 
         .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 0% 0%, var(--glow-1) 0%, transparent 60%), radial-gradient(circle at 100% 100%, var(--glow-2) 0%, transparent 60%), #000; z-index: -1; transition: 0.8s ease; }
 
-        .header-islands { position: sticky; top: 0; z-index: 1000; padding: 50px 16px 15px; display: grid; grid-template-columns: 1fr auto auto; gap: 12px; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); }
-        .island { background: var(--island-bg); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border-radius: 22px; display: flex; align-items: center; }
+        .header-islands { 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            padding: 50px 16px 15px; 
+            display: grid; 
+            grid-template-columns: 2fr 0.5fr 0.5fr 0.8fr; 
+            gap: 10px; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%); 
+            align-items: stretch;
+        }
+
+        .island { background: var(--island-bg); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border-radius: 26px; display: flex; align-items: center; }
         
-        .island-date { padding: 12px 18px; flex-direction: column; align-items: flex-start; }
-        .date-text { font-size: 11px; font-weight: 800; color: var(--icon-main-color); text-transform: uppercase; transition: 0.4s; text-shadow: 0 0 15px var(--icon-glow); }
-        .month-text { font-size: 19px; font-weight: 900; color: #fff; }
+        .island-date { padding: 18px 22px; flex-direction: column; align-items: flex-start; justify-content: center; }
+        .date-text { font-size: 15px; font-weight: 800; color: var(--icon-main-color); text-transform: uppercase; transition: 0.4s; text-shadow: 0 0 15px var(--icon-glow); margin-bottom: 2px; }
+        .month-text { font-size: 26px; font-weight: 900; color: #fff; line-height: 1.1; }
         
-        .side-controls { display: flex; flex-direction: column; gap: 8px; }
-        .theme-btn, .game-btn, .view-btn { border: none; background: rgba(255,255,255,0.05); color: #fff; width: 44px; height: 44px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1); }
+        .side-controls-stack { display: flex; flex-direction: column; gap: 8px; }
         
+        .theme-btn, .game-btn, .ai-open-btn, .view-btn { border: none; background: rgba(255,255,255,0.06); color: #fff; width: 100%; height: 46px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1); }
+        
+        .ai-column { display: flex; align-items: flex-start; }
+        .ai-open-btn { height: 46px; width: 46px; border-radius: 18px; }
+
+        .island-controls { padding: 8px; gap: 6px; justify-content: center; }
+        .view-btn { width: 44px; height: 44px; border-radius: 16px; font-size: 18px; }
         .view-btn.active { background: var(--icon-main-color); box-shadow: 0 0 25px var(--icon-glow); border-color: transparent; }
 
-        .island-week { grid-column: 1 / span 3; justify-content: space-between; padding: 10px 15px; margin-top: 5px; }
-        .nav-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; font-weight: 900; }
+        .island-week { grid-column: 1 / span 4; justify-content: space-between; padding: 6px 20px; margin-top: 5px; border-radius: 20px; min-height: 45px; }
+        .nav-btn { background: rgba(255,255,255,0.1); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; font-weight: 900; font-size: 14px; }
+        .week-num { font-size: 18px !important; }
+        #weekType { font-size: 8px !important; }
 
         .container { padding: 10px 16px 150px; max-width: 600px; margin: 0 auto; }
         
@@ -66,13 +84,24 @@
         .badge-live { background: var(--ios-pink); color: white; animation: pulse 1.5s infinite; }
         .badge-timer { border: 1px solid var(--ios-green); color: var(--ios-green); }
 
+        .ai-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(40px); z-index: 5000; display: none; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+        .ai-container { background: rgba(15, 15, 17, 0.98); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 35px; width: 98%; max-width: 650px; height: 94vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.8); }
+        .ai-header { padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(255,255,255,0.07), transparent); border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .ai-chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        
+        .ai-msg { max-width: 85%; padding: 12px 18px; border-radius: 20px; font-size: 17px; line-height: 1.4; position: relative; animation: slideUp 0.3s ease; white-space: pre-wrap; font-weight: 500; }
+        .ai-msg.bot { align-self: flex-start; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); border-bottom-left-radius: 4px; color: #fff; }
+        .ai-msg.user { align-self: flex-end; background: #0088cc; border-bottom-right-radius: 4px; color: white; box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3); }
+        
+        .ai-input-wrapper { padding: 15px; background: rgba(0,0,0,0.4); display: flex; gap: 10px; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); }
+        .ai-input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 22px; padding: 12px 18px; color: #fff; outline: none; font-size: 16px; }
+        .ai-send-btn { background: var(--ios-pink); border: none; width: 45px; height: 45px; border-radius: 50%; color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 0 15px var(--icon-glow); }
 
         .theme-menu { position: fixed; bottom: -100%; left: 0; width: 100%; background: rgba(10, 10, 12, 0.98); backdrop-filter: blur(50px); border-top: 1px solid rgba(255,255,255,0.15); border-radius: 35px 35px 0 0; padding: 30px 20px 60px; z-index: 2000; transition: bottom 0.5s ease; max-height: 85vh; overflow-y: auto; }
         .theme-menu.open { bottom: 0; }
         .color-row { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
         .color-dot { width: 42px; height: 42px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); }
         .label-theme { font-size: 12px; font-weight: 800; color: var(--text-secondary); margin-bottom: 10px; display: block; text-transform: uppercase; }
-
 
         .game-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
         .game-card { background: #1c1c1e; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px; padding: 20px; width: 100%; max-width: 400px; position: relative; }
@@ -85,26 +114,44 @@
         .game-progress-fill { height: 100%; background: var(--ios-pink); width: 0%; transition: 0.3s; }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 4000; display: none; align-items: center; justify-content: center; padding: 30px; }
-        .modal-card { background: rgba(30, 30, 32, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 30px; width: 100%; max-width: 340px; text-align: center; }
-        .modal-title { font-weight: 900; font-size: 20px; margin-bottom: 15px; color: #fff; }
-        .modal-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 25px; }
-        .modal-btns { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .modal-btn-main { background: var(--ios-pink); border: none; color: #fff; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 14px; }
-        .modal-btn-sub { background: rgba(255,255,255,0.05); border: none; color: #fff; padding: 16px; border-radius: 18px; font-weight: 800; font-size: 14px; }
+        .modal-card { background: rgba(30, 30, 32, 0.95); border: 1px solid rgba(255,255,255,0.15); border-radius: 35px; padding: 35px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .modal-title { font-weight: 900; font-size: 20px; margin-bottom: 15px; color: #fff; letter-spacing: 1px; }
+        .modal-desc { font-size: 15px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 30px; }
+        .modal-btns { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .modal-btn-main { background: var(--ios-pink); border: none; color: #fff; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 15px; transition: 0.3s; }
+        .modal-btn-sub { background: rgba(255,255,255,0.08); border: none; color: #fff; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 15px; }
 
         @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.03); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="hide-locked">
 
 <div class="bg-glow" id="bgGlow"></div>
 
+<div class="ai-overlay" id="aiOverlay">
+    <div class="ai-container">
+        <div class="ai-header">
+            <span style="font-weight: 900; font-size: 20px; letter-spacing: 1px; color: var(--ios-pink);">KAZ1NAK AI</span>
+            <button onclick="toggleAI()" style="background: rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 50%; border:none; color:#fff; font-weight: bold; font-size: 16px;">✕</button>
+        </div>
+        <div class="ai-chat-box" id="aiChat">
+            <div class="ai-msg bot">Привет, я kaz1nak AI. Чем помочь?</div>
+        </div>
+        <div class="ai-input-wrapper">
+            <input type="text" class="ai-input" id="aiInput" placeholder="Слушаю..." onkeypress="if(event.key==='Enter') sendAI()">
+            <button class="ai-send-btn" onclick="sendAI()">→</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="customModal">
     <div class="modal-card">
-        <div class="modal-title">ПОДТВЕРДИТЕ ДЕЙСТВИЕ</div>
-        <div class="modal-desc">Внимание! Это удалит весь прогресс раскраски и вернет вас на 1 уровень. Вы уверены?</div>
+        <div class="modal-title" id="modalTitle">ПОДТВЕРДИТЕ ДЕЙСТВИЕ</div>
+        <div class="modal-desc" id="modalDesc">Внимание! Это действие нельзя будет отменить. Вы уверены?</div>
         <div class="modal-btns">
-            <button class="modal-btn-main" onclick="confirmResetAll()">ДА, СБРОСИТЬ</button>
+            <button class="modal-btn-main" id="modalConfirmBtn">ДА, СБРОСИТЬ</button>
             <button class="modal-btn-sub" onclick="closeModal()">ОТМЕНА</button>
         </div>
     </div>
@@ -133,10 +180,10 @@
         <div class="pixel-grid" id="pixelGrid"></div>
         <div id="gamePalette" style="display:flex; gap:8px; justify-content:center; margin-bottom:20px; flex-wrap:wrap;"></div>
         <div id="gameActions" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom: 10px;">
-            <button onclick="resetArt()" style="padding:15px; border-radius:18px; background:#2c2c2e; border:none; color:#fff; font-weight:800; font-size: 12px;">СБРОС СЛОЯ</button>
+            <button onclick="openResetLayerModal()" style="padding:15px; border-radius:18px; background:#2c2c2e; border:none; color:#fff; font-weight:800; font-size: 12px;">СБРОС СЛОЯ</button>
             <button onclick="toggleGame()" style="padding:15px; border-radius:18px; background:#3a3a3c; border:none; color:#fff; font-weight:800; font-size: 12px;">ВЫХОД</button>
         </div>
-        <button onclick="openResetModal()" style="width:100%; padding:15px; border-radius:18px; background:rgba(255,55,95,0.15); border:1px solid var(--ios-pink); color:var(--ios-pink); font-weight:800; font-size: 12px;">СБРОСИТЬ ВСЁ</button>
+        <button onclick="openResetAllModal()" style="width:100%; padding:15px; border-radius:18px; background:rgba(255,55,95,0.15); border:1px solid var(--ios-pink); color:var(--ios-pink); font-weight:800; font-size: 12px;">СБРОСИТЬ ВСЁ</button>
         <button id="nextLevelBtn" onclick="nextTemplate()" style="display:none; width:100%; padding:18px; border-radius:18px; background:var(--ios-green); border:none; color:#fff; font-weight:900; margin-top:10px; animation: pulse 1s infinite;">СЛЕДУЮЩИЙ УРОВЕНЬ ✨</button>
     </div>
 </div>
@@ -146,19 +193,26 @@
         <span class="date-text" id="islandDay">---</span>
         <span class="month-text" id="islandDate">---</span>
     </div>
-    <div class="side-controls">
+
+    <div class="side-controls-stack">
         <button class="theme-btn" onclick="toggleMenu()">🎨</button>
         <button class="game-btn" onclick="toggleGame()">🎮</button>
     </div>
-    <div class="island island-controls" style="padding:6px; gap:6px;">
+
+    <div class="ai-column">
+        <button class="ai-open-btn" onclick="toggleAI()">🤖</button>
+    </div>
+
+    <div class="island island-controls">
         <button class="view-btn" id="btnShowAll" onclick="setViewMode('all')">👁️</button>
         <button class="view-btn active" id="btnHideLocked" onclick="setViewMode('clean')">🙈</button>
     </div>
+
     <div class="island island-week">
         <button class="nav-btn" onclick="changeWeek(-1)">-</button>
         <div style="text-align: center;">
-            <span style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; font-weight:700;" id="weekType">ТЕКУЩАЯ НЕДЕЛЯ</span>
-            <span class="week-num" id="weekNumDisplay" style="display:block; font-size:22px; font-weight:900;">1</span>
+            <span style="font-size:9px; color:var(--text-secondary); text-transform:uppercase; font-weight:700; letter-spacing: 0.5px;" id="weekType">НЕДЕЛЯ</span>
+            <span class="week-num" id="weekNumDisplay" style="display:block; font-weight:900; line-height: 1.1;">1</span>
         </div>
         <button class="nav-btn" onclick="changeWeek(1)">+</button>
     </div>
@@ -168,43 +222,96 @@
 
 <script>
     const START_DATE = new Date('2026-02-09T00:00:00');
+    
+
     const schedule = [
-        { d: 1, t: "10:10 - 11:40", s: "Татарский Язык", r: "258, 262, 263", p: "Сибгаева / Набиуллина", w: [1,15], i: "🕌" },
-        { d: 1, t: "10:10 - 11:40", s: "Осн. композиции и дизайна", r: "262", p: "Кринская З.А.", w: [16,17], i: "📐" },
+
+        { d: 1, t: "08:30 - 10:00", s: "Осн. композиции и дизайна", r: "262", p: "Кринская З.А.", w: [16,17], i: "📐" },
+        { d: 1, t: "10:10 - 11:40", s: "Татарский Язык", r: "258, 262, 263", p: "Салахова Р.Р", w: [1,15], i: "🕌" },
+        { d: 1, t: "10:10 - 11:40", s: "Осн. композиции и дизайна", r: "262", p: "Кринская З.А.", w: [16,17], i: "🎨" },
+
         { d: 2, t: "08:00 - 09:30", s: "Физическая Культура", r: "СК Москва", p: "Шалавина А.С.", w: [1,16], i: "👟" },
-        { d: 2, t: "10:10 - 11:40", s: "Комп. и дизайн в рекламе", r: "207", p: "Кринская З.А.", w: [1,7], i: "🎨" },
-        { d: 2, t: "10:10 - 11:40", s: "Графическое искусство", r: "171", p: "Шайхутдинова А.Р.", w: [8,14], i: "✒️" },
-        { d: 3, t: "08:30 - 10:00", s: "История России", r: "355 акт.зал", p: "Саматова Ч.Х.", w: [1,8], i: "📜" },
-        { d: 3, t: "08:30 - 10:00", s: "Проф. практика", r: "444", p: "Аниферова В.В.", w: [9,17], i: "💼" },
-        { d: 3, t: "10:10 - 11:40", s: "История России", r: "355 акт.зал", p: "Саматова Ч.Х.", w: [1,9], i: "🇷🇺" },
-        { d: 3, t: "10:10 - 11:40", s: "Проф. практика", r: "429", p: "Аниферова В.В.", w: [10,17], i: "📂" },
+        { d: 2, t: "10:10 - 11:40", s: "Осн. композиции и дизайна", r: "207", p: "Кринская З.А.", w: [1,1], i: "📐" },
+        { d: 2, t: "10:10 - 11:40", s: "Осн. композиции и дизайна", r: "207", p: "Кринская З.А.", w: [5,5], i: "📐" },
+        { d: 2, t: "10:10 - 11:40", s: "Осн. Графического Искусства", r: "171", p: "Шайхутдинова А.Р.", w: [8,14], i: "✒️" },
+        { d: 2, t: "12:10 - 13:40", s: "Осн. композиции и дизайна", r: "207", p: "Кринская З.А.", w: [5,5], i: "🎨" },
+
+        { d: 3, t: "08:30 - 10:10", s: "История России", r: "актовый зал", p: "Саматова Ч.Х.", w: [1,8], i: "📜" },
+        { d: 3, t: "08:30 - 10:10", s: "Ознакомительная практика", r: "444", p: "Аниферова В.В.", w: [9,17], i: "💼" },
+        { d: 3, t: "10:10 - 11:40", s: "История России", r: "актовый зал", p: "Саматова Ч.Х.", w: [1,9], i: "🇷🇺" },
+        { d: 3, t: "10:10 - 11:40", s: "Проф-ознакомительная практика", r: "429", p: "Аниферова В.В.", w: [10,17], i: "📂" },
         { d: 3, t: "12:10 - 13:40", s: "Язык и стиль СМИ", r: "473", p: "Аниферова В.В.", w: [8,14], i: "✍️" },
-        { d: 3, t: "13:50 - 15:20", s: "Технологии рекламного пр-ва", r: "239", p: "Шайхутдинов Т.М.", w: [1,2], i: "🎬" },
-        { d: 3, t: "13:50 - 15:20", s: "Информационные технологии", r: "473", p: "Алехандро", w: [11,17], i: "💻" },
-        { d: 3, t: "17:30 - 19:00", s: "Технология произв.", r: "346", p: "Шайхутдинов Т.М.", w: [9,14], i: "🎥" },
-        { d: 3, t: "19:10 - 20:40", s: "Видеоконтент (Практикум)", r: "210 / 475", p: "Ямщиков И.В.", w: [9,16], i: "🎞️" },
-        { d: 4, t: "08:30 - 10:00", s: "Компьютерная графика", r: "475", p: "Шамсутдинов Р.Н.", w: [1,17], i: "🖥️" },
-        { d: 4, t: "10:10 - 11:40", s: "PR и коммуникации", r: "239", p: "Сафина Л.Н.", w: [1,17], i: "📢" },
-        { d: 4, t: "12:10 - 13:40", s: "Компьютерная графика", r: "473", p: "Шамсутдинов Р.Н.", w: [11,14], i: "🖱️" },
-        { d: 4, t: "13:50 - 15:20", s: "Эстетика медиа", r: "346/210", p: "Ахметшина Э.Г.", w: [3,17], i: "🎭" },
-        { d: 4, t: "15:50 - 17:20", s: "Язык и стиль СМИ", r: "207", p: "Аниферова В.В.", w: [1,5], i: "🖋️" },
-        { d: 4, t: "17:30 - 19:00", s: "Эстетика Медиа Комм.", r: "210", p: "Ахметшина Э.Г.", w: [3,7], i: "💡" },
-        { d: 4, t: "17:30 - 19:00", s: "Язык СМИ", r: "207", p: "Аниферова В.В.", w: [10,15], i: "📰" },
-        { d: 4, t: "19:10 - 20:40", s: "Проф. практика", r: "256", p: "Аниферова В.В.", w: [1,9], i: "💼" },
-        { d: 5, t: "08:00 - 09:30", s: "Физическая Культура", r: "СК Москва", p: "Шалавина А.С.", w: [1,16], i: "👟" },
-        { d: 5, t: "10:10 - 11:40", s: "Бренд-коммуникации", r: "444", p: "Мишалина М.А.", w: [1,17], i: "💎" },
+        { d: 3, t: "12:50 - 15:20", s: "Рекламное пр-во и видеопродакшн", r: "239", p: "Шайхутдинов Т.М.", w: [1,1], i: "🎬" },
+        { d: 3, t: "12:50 - 15:20", s: "Информационные технологии", r: "473", p: "Алехандро", w: [11,17], i: "💻" },
+
+        { d: 4, t: "08:30 - 10:00", s: "Осн. компьютерной графики", r: "475", p: "Шамсутдинов Р.Н.", w: [1,17], i: "🖥️" },
+        { d: 4, t: "10:10 - 11:40", s: "Теория и практика PR", r: "239", p: "Сафина Л.Н.", w: [1,17], i: "📢" },
+        { d: 4, t: "12:10 - 13:40", s: "Язык и стиль СМИ", r: "109", p: "Аниферова В.В.", w: [1,4], i: "🖋️" },
+        { d: 4, t: "12:10 - 13:40", s: "Осн. Компьютерной Графики", r: "473", p: "Шамсутдинов Р.Н.", w: [11,14], i: "🖱️" },
+        { d: 4, t: "13:50 - 15:20", s: "Рекламное пр-во и видеопродакшн", r: "346", p: "Ямщиков И.В.", w: [2,2], i: "🎥" },
+        { d: 4, t: "13:50 - 15:20", s: "Эстетика медиа коммуникаций", r: "346 (с 14н: 210)", p: "Ахметшина Э.Г.", w: [3,17], i: "🎭" },
+        { d: 4, t: "15:50 - 17:20", s: "Видеоконтент (Практикум)", r: "210 (2-5н), 475 (6-9н)", p: "Ямщиков И.В.", w: [2,9], i: "🎞️" },
+        { d: 4, t: "17:30 - 19:00", s: "Эстетика медиа коммуникаций", r: "210", p: "Ахметшина Э.Г.", w: [3,7], i: "💡" },
+        { d: 4, t: "17:30 - 19:00", s: "Язык и Стиль СМИ", r: "429", p: "Аниферова В.В.", w: [10,15], i: "📰" },
+        { d: 4, t: "17:30 - 19:00", s: "Рекламное пр-во и видеопродакшн", r: "207", p: "Ямщиков И.В.", w: [2,2], i: "🎥" },
+        { d: 4, t: "17:30 - 19:00", s: "Рекламное пр-во и видеопродакшн", r: "207", p: "Ямщиков И.В.", w: [9,13], i: "🎥" },
+        { d: 4, t: "19:10 - 20:40", s: "Проф-ознакомительная практика", r: "256", p: "Аниферова В.В.", w: [1,9], i: "💼" },
+
+        { d: 5, t: "08:00 - 09:30", s: "Физическая культура", r: "СК Москва", p: "Шалавина А.С.", w: [1,16], i: "👟" },
         { d: 5, t: "12:10 - 13:40", s: "Типографика и шрифт", r: "464 (с 11н: 476)", p: "Сафина Э.С.", w: [1,17], i: "🎨" },
-        { d: 5, t: "17:30 - 19:10", s: "История России", r: "263", p: "Кисиленко А.О.", w: [1,12], i: "🏛️" },
-        { d: 6, t: "08:30 - 10:00", s: "ЦОР Типографика", r: "464", p: "Сафина Э.С.", w: [1,5], i: "💻" },
-        { d: 6, t: "08:30 - 10:00", s: "Английский Язык", r: "465", p: "Бурлакова Э.В.", w: [17,17], i: "🇬🇧" },
-        { d: 6, t: "12:10 - 13:40", s: "Иностранный Язык", r: "464/475/476", p: "Бурлакова / Планкина", w: [1,17], i: "🌍" },
-        { d: 6, t: "13:50 - 15:20", s: "Живопись", r: "171", p: "Сафина", w: [3,9], i: "🖼️" },
-        { d: 6, t: "13:50 - 15:20", s: "Филол. Брендинг", r: "239", p: "Благодарова О.А.", w: [10,14], i: "📚" },
-        { d: 6, t: "15:50 - 17:20", s: "Филология Брендинга", r: "239", p: "Благодарова О.А.", w: [10,13], i: "📖" },
-        { d: 6, t: "17:30 - 19:00", s: "Филология Брендинга", r: "239", p: "Благодарова о.а.", w: [1,9], i: "✒️" },
-        { d: 6, t: "17:30 - 19:00", s: "Инфотех", r: "473", p: "Алехандро", w: [10,17], i: "📱" },
-        { d: 6, t: "19:10 - 20:40", s: "Инфотех (ЦОР)", r: "Онлайн", p: "Алехандро", w: [1,3], i: "☁️" }
+        { d: 5, t: "13:50 - 15:20", s: "Осн. граф. бренд коммуникаций", r: "444", p: "Мишалина М.А.", w: [1,17], i: "💎" },
+        { d: 5, t: "15:50 - 17:20", s: "Информационные технологии", r: "326", p: "Алехандро", w: [1,9], i: "💻" },
+        { d: 5, t: "17:30 - 19:10", s: "История России", r: "263", p: "Кисленко А.О.", w: [1,12], i: "🏛️" },
+
+        { d: 6, t: "08:30 - 10:00", s: "Иностранный Язык", r: "464,475,476", p: "Бурлакова Э.В.", w: [17,17], i: "🇬🇧" },
+        { d: 6, t: "12:10 - 13:40", s: "Иностранный Язык", r: "464,475,476", p: "Бурлакова Э.В.", w: [1,17], i: "🌍" },
+        { d: 6, t: "13:50 - 15:20", s: "Живопись", r: "171", p: "Сафина Э.С.", w: [3,9], i: "🖼️" },
+        { d: 6, t: "13:50 - 15:20", s: "Филол. обеспечение брендинга", r: "258", p: "Благодарова О.А.", w: [10,14], i: "📚" },
+        { d: 6, t: "15:50 - 17:20", s: "Филол. обеспечение брендинга", r: "258", p: "Благодарова О.А.", w: [10,13], i: "📖" },
+        { d: 6, t: "17:30 - 19:00", s: "Филол. обеспечение брендинга", r: "258", p: "Благодарова О.А.", w: [1,9], i: "✒️" },
+        { d: 6, t: "17:30 - 19:00", s: "Информационные технологии", r: "473", p: "Алехандро", w: [10,17], i: "📱" }
     ];
+
+    function formatMarkdown(t) {
+        return t.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    }
+
+    function toggleAI() {
+        const el = document.getElementById('aiOverlay');
+        el.style.display = (el.style.display === 'flex' ? 'none' : 'flex');
+    }
+
+    async function sendAI() {
+        const input = document.getElementById('aiInput');
+        const chat = document.getElementById('aiChat');
+        const text = input.value.trim();
+        if (!text) return;
+
+        chat.innerHTML += `<div class="ai-msg user">${formatMarkdown(text)}</div>`;
+        input.value = '';
+        chat.scrollTop = chat.scrollHeight;
+
+        const loader = document.createElement('div');
+        loader.className = 'ai-msg bot';
+        loader.innerText = 'Думаю...';
+        chat.appendChild(loader);
+
+        try {
+            const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(text)}?model=openai&system=${encodeURIComponent("Ты kaz1nak AI. Отвечай коротко на русском. Используй markdown (**жирный**, *курсив*) для оформления. Ты стильная и мощная нейросеть.")}`);
+            
+            if (response.status === 429) {
+                loader.innerText = "Ща, очередь переполнена, обнови страницу";
+            } else {
+                const result = await response.text();
+                loader.innerHTML = formatMarkdown(result);
+            }
+        } catch (e) {
+            loader.innerText = "Ошибка связи. Проверь интернет или попробуй позже.";
+        }
+        chat.scrollTop = chat.scrollHeight;
+    }
 
     const gameTemplates = [
         { n: "HEART", c: ["#ff375f","#ff80ab"], d: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,1,1,1,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0] },
@@ -216,9 +323,28 @@
     let selectedColorIdx = null; 
     let artProgress = JSON.parse(localStorage.getItem('sumbul_art')) || {};
 
-    function openResetModal() { document.getElementById('customModal').style.display = 'flex'; }
     function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+    function openResetAllModal() { 
+        document.getElementById('modalTitle').innerText = "СБРОСИТЬ ВСЁ?";
+        document.getElementById('modalDesc').innerText = "Внимание! Это удалит прогресс раскраски. Вы уверены?";
+        const btn = document.getElementById('modalConfirmBtn');
+        btn.onclick = confirmResetAll;
+        document.getElementById('customModal').style.display = 'flex'; 
+    }
+    function openResetLayerModal() {
+        document.getElementById('modalTitle').innerText = "СБРОСИТЬ СЛОЙ?";
+        document.getElementById('modalDesc').innerText = "Очистить текущий рисунок?";
+        const btn = document.getElementById('modalConfirmBtn');
+        btn.onclick = confirmResetArt;
+        document.getElementById('customModal').style.display = 'flex';
+    }
     function confirmResetAll() { artProgress = {}; localStorage.removeItem('sumbul_art'); currentArtIdx = 0; initGame(); closeModal(); }
+    function confirmResetArt() {
+        Object.keys(artProgress).forEach(k => { if(k.startsWith(currentArtIdx + '_')) delete artProgress[k]; }); 
+        localStorage.setItem('sumbul_art', JSON.stringify(artProgress)); 
+        initGame(); 
+        closeModal();
+    }
 
     function initGame() {
         const art = gameTemplates[currentArtIdx];
@@ -235,7 +361,6 @@
                 else { 
                     pixel.innerText = val; 
                     pixel.onclick = () => { 
-                        
                         if (selectedColorIdx !== null && selectedColorIdx + 1 === val) {
                             artProgress[pKey] = true; 
                             localStorage.setItem('sumbul_art', JSON.stringify(artProgress)); 
@@ -264,7 +389,6 @@
     }
 
     function nextTemplate() { currentArtIdx = (currentArtIdx + 1) % gameTemplates.length; selectedColorIdx = null; initGame(); }
-    function resetArt() { if(confirm("Сбросить слой?")) { Object.keys(artProgress).forEach(k => { if(k.startsWith(currentArtIdx + '_')) delete artProgress[k]; }); localStorage.setItem('sumbul_art', JSON.stringify(artProgress)); initGame(); } }
 
     function saveTheme() {
         const theme = {
@@ -289,18 +413,13 @@
         }
     }
 
-    const customColors = [
-        { c: '#ff375f' }, { c: '#007aff' }, { c: '#30d158' },
-        { c: '#ffcc00' }, { c: '#af52de' }, { c: '#ffffff' },
-        { c: '#000000' }, { c: '#8e8e93' }
-    ];
-
     function initThemes() {
         const r1 = document.getElementById('rowGlow1'), r2 = document.getElementById('rowGlow2'), ri = document.getElementById('rowIconGlow');
-        customColors.forEach(color => {
-            r1.innerHTML += `<div class="color-dot" style="background:${color.c}" onclick="setGlow('glow1', '${color.c}')"></div>`;
-            r2.innerHTML += `<div class="color-dot" style="background:${color.c}" onclick="setGlow('glow2', '${color.c}')"></div>`;
-            ri.innerHTML += `<div class="color-dot" style="background:${color.c}" onclick="setGlow('icon', '${color.c}')"></div>`;
+        const colors = ['#ff375f','#007aff','#30d158','#ffcc00','#af52de','#ffffff','#000000','#8e8e93'];
+        colors.forEach(c => {
+            r1.innerHTML += `<div class="color-dot" style="background:${c}" onclick="setGlow('glow1', '${c}')"></div>`;
+            r2.innerHTML += `<div class="color-dot" style="background:${c}" onclick="setGlow('glow2', '${c}')"></div>`;
+            ri.innerHTML += `<div class="color-dot" style="background:${c}" onclick="setGlow('icon', '${c}')"></div>`;
         });
     }
 
@@ -309,8 +428,7 @@
         else if(type === 'glow2') document.documentElement.style.setProperty('--glow-2', color + '59');
         else if(type === 'icon') {
             document.documentElement.style.setProperty('--icon-main-color', color);
-            const glowHex = (color === '#000000') ? '#ffffff33' : color + '99'; 
-            document.documentElement.style.setProperty('--icon-glow', glowHex);
+            document.documentElement.style.setProperty('--icon-glow', color === '#000000' ? '#ffffff33' : color + '99');
         }
         saveTheme();
     }
@@ -366,7 +484,7 @@
                 const status = getSmartStatus(l, currentWeek);
                 const isLocked = status.type === 'locked';
                 section.innerHTML += `<div class="card ${isLocked?'locked':''} ${status.type==='passed'?'is-passed':''} ${status.type==='live'?'is-live':''}">
-                    ${isLocked?`<div style="position:absolute;right:15px;top:15px;width:35px;height:35px;background:rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;" onclick="this.parentElement.classList.toggle('revealed')">👁️</div>`:''}
+                    ${isLocked?`<div style=\"position:absolute;right:15px;top:15px;width:35px;height:35px;background:rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;\" onclick=\"this.parentElement.classList.toggle('revealed')\">👁️</div>`:''}
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;"><span style="font-size:20px;font-weight:800;">${l.t}</span><span class="badge ${status.class}">${status.label}</span></div>
                     <div style="display:flex;gap:15px;align-items:center;">
                         <div class="icon-box">${l.i}</div>
