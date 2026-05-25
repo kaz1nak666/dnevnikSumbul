@@ -8,6 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Расписание КФУ">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Красивое мобильное расписание КФУ с неделями, админкой, импортом и экспортом.">
 
     <style>
         :root {
@@ -410,21 +412,465 @@
             padding: 16px; border-radius: 15px; color: #fff; font-weight: 700; margin-bottom: 8px;
         }
         .as-btn:active { background: var(--ios-pink); }
+
+
+        /* ===== APP UPGRADES ===== */
+        .schedule-tools { max-width: 600px; margin: 0 auto; padding: 0 16px 8px; display: grid; grid-template-columns: 1fr; gap: 10px; align-items: center; }
+        .schedule-search { min-width: 0; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 18px; padding: 13px 15px; font-size: 15px; outline: none; backdrop-filter: blur(25px); }
+        .schedule-search::placeholder { color: rgba(255,255,255,0.35); }
+        .mini-action-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 16px; width: 46px; height: 46px; font-size: 18px; font-weight: 800; }
+        .today-hero { background: linear-gradient(135deg, rgba(255,55,95,0.18), rgba(0,122,255,0.14)); border: 1px solid rgba(255,255,255,0.13); border-radius: 26px; padding: 18px; margin: 6px 0 18px; backdrop-filter: blur(35px); box-shadow: 0 16px 40px rgba(0,0,0,0.25); }
+        .today-hero-top { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 12px; }
+        .today-kicker { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; font-weight: 900; letter-spacing: 0.5px; }
+        .today-name { font-size: 20px; font-weight: 900; line-height: 1.15; margin-top: 3px; }
+        .today-meta { color: var(--text-secondary); font-size: 13px; line-height: 1.4; }
+        .today-icon { width: 52px; height: 52px; border-radius: 16px; background: var(--icon-main-color); display: flex; align-items: center; justify-content: center; font-size: 26px; box-shadow: 0 0 25px var(--icon-glow); flex-shrink: 0; }
+        .empty-state { border: 1px dashed rgba(255,255,255,0.14); border-radius: 22px; padding: 22px; text-align: center; color: var(--text-secondary); background: rgba(255,255,255,0.03); margin-bottom: 18px; }
+        .admin-tools-panel { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; display: none; flex-direction: column; gap: 12px; padding-bottom: calc(18px + env(safe-area-inset-bottom, 20px)); }
+        .admin-tools-panel.active { display: flex; }
+        .admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .admin-stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; min-width: 0; }
+        .admin-stat-num { font-size: 20px; font-weight: 900; color: #fff; line-height: 1; }
+        .admin-stat-label { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; font-weight: 800; margin-top: 6px; line-height: 1.25; }
+        .admin-list-search { margin-bottom: 12px; }
+        .admin-card-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+        .admin-edit-btn { background: rgba(0,122,255,0.12); color: var(--ios-blue); border: 1px solid rgba(0,122,255,0.25); padding: 8px 11px; border-radius: 11px; font-weight: 800; font-size: 12px; white-space: nowrap; }
+        .admin-tool-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); border-radius: 20px; padding: 16px; }
+        .admin-tool-title { font-size: 14px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+        .admin-tool-desc { color: var(--text-secondary); font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+        .admin-import-area { width: 100%; min-height: 160px; background: #050505; color: var(--ios-green); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; resize: vertical; outline: none; }
+        .admin-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+        .admin-btn-danger { background: rgba(255,55,95,0.14); border: 1px solid rgba(255,55,95,0.35); color: var(--ios-pink); padding: 14px; border-radius: 16px; font-weight: 900; font-size: 12px; width: 100%; }
+        .admin-btn-neutral { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #fff; padding: 14px; border-radius: 16px; font-weight: 900; font-size: 12px; width: 100%; }
+        .admin-btn-add.is-editing { background: linear-gradient(135deg, #007aff, #5856d6); box-shadow: 0 4px 20px rgba(0,122,255,0.3); }
+        .toast { position: fixed; left: 16px; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 10000; background: rgba(28,28,30,0.96); color: #fff; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 14px 16px; font-size: 13px; font-weight: 800; text-align: center; box-shadow: 0 12px 30px rgba(0,0,0,0.35); transform: translateY(120px); opacity: 0; transition: 0.3s ease; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        @media (max-width: 430px) {
+            .admin-stats { grid-template-columns: 1fr; }
+            .admin-card { align-items: flex-start; }
+            .admin-card-actions { flex-direction: row; }
+            .admin-row { flex-direction: column; }
+            .schedule-tools { grid-template-columns: 1fr; }
+            .mini-action-btn { width: 100%; }
+        }
+
+
+
+        /* ===== IOS 28 POLISH ===== */
+        :root {
+            --ios-bg: #050507;
+            --island-bg: rgba(18, 18, 22, 0.56);
+            --card-blur: 24px;
+            --glass-opacity: 0.065;
+            --hairline: rgba(255,255,255,0.14);
+            --hairline-soft: rgba(255,255,255,0.075);
+            --surface-glass: rgba(255,255,255,0.072);
+            --surface-glass-2: rgba(255,255,255,0.045);
+            --shadow-ios: 0 18px 46px rgba(0,0,0,0.34);
+            --shadow-soft: 0 9px 24px rgba(0,0,0,0.24);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 18% -4%, rgba(255,55,95,0.28), transparent 36%),
+                radial-gradient(circle at 96% 10%, rgba(0,122,255,0.22), transparent 34%),
+                radial-gradient(circle at 75% 92%, rgba(175,82,222,0.14), transparent 36%),
+                #050507;
+        }
+
+        .bg-glow {
+            opacity: 0.72;
+            filter: saturate(1.08);
+            background:
+                radial-gradient(circle at 0% 0%, var(--glow-1) 0%, transparent 46%),
+                radial-gradient(circle at 100% 100%, var(--glow-2) 0%, transparent 48%),
+                linear-gradient(180deg, rgba(255,255,255,0.025), transparent 38%),
+                #050507;
+        }
+
+        .header-islands {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: calc(38px + env(safe-area-inset-top, 0px)) 14px 14px;
+            gap: 9px;
+            background:
+                linear-gradient(to bottom, rgba(5,5,7,0.94), rgba(5,5,7,0.58) 70%, transparent);
+        }
+
+        .island,
+        .theme-btn,
+        .game-btn,
+        .ai-open-btn,
+        .view-btn,
+        .nav-btn,
+        .schedule-search,
+        .mini-action-btn {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.115), rgba(255,255,255,0.045)),
+                rgba(18,18,22,0.54);
+            border: 1px solid var(--hairline);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.16),
+                inset 0 -1px 0 rgba(255,255,255,0.035),
+                var(--shadow-soft);
+            backdrop-filter: blur(28px) saturate(1.45);
+            -webkit-backdrop-filter: blur(28px) saturate(1.45);
+        }
+
+        .island-date {
+            border-radius: 28px;
+            min-height: 72px;
+            padding: 13px 18px;
+        }
+
+        .date-text {
+            font-size: 12px;
+            letter-spacing: 0.055em;
+            text-shadow: 0 0 14px var(--icon-glow);
+        }
+
+        .month-text {
+            font-size: 24px;
+            letter-spacing: -0.045em;
+        }
+
+        .theme-btn,
+        .game-btn,
+        .ai-open-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 18px;
+        }
+
+        .theme-btn:active,
+        .game-btn:active,
+        .ai-open-btn:active,
+        .view-btn:active,
+        .nav-btn:active {
+            transform: scale(0.94);
+        }
+
+        .island-controls {
+            padding: 5px;
+            gap: 5px;
+            border-radius: 20px;
+        }
+
+        .view-btn {
+            width: 39px;
+            height: 39px;
+            border-radius: 15px;
+        }
+
+        .view-btn.active {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.05)),
+                var(--icon-main-color);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.25),
+                0 0 22px var(--icon-glow);
+        }
+
+        .island-week {
+            min-height: 50px;
+            border-radius: 21px;
+            margin-top: 2px;
+            padding: 8px 16px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.075);
+        }
+
+        .week-num {
+            font-size: 21px !important;
+            letter-spacing: -0.04em;
+        }
+
+        #weekType {
+            font-size: 9px !important;
+            letter-spacing: 0.08em;
+        }
+
+        .container,
+        .schedule-tools {
+            max-width: 640px;
+        }
+
+        .schedule-tools {
+            padding: 4px 14px 10px;
+        }
+
+        .schedule-search {
+            min-height: 48px;
+            border-radius: 18px;
+            font-weight: 650;
+        }
+
+        .mini-action-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 18px;
+        }
+
+        .today-hero {
+            border-radius: 28px;
+            padding: 19px;
+            background:
+                linear-gradient(135deg, rgba(255,55,95,0.18), rgba(0,122,255,0.12)),
+                linear-gradient(180deg, rgba(255,255,255,0.095), rgba(255,255,255,0.045));
+            border: 1px solid var(--hairline);
+            box-shadow: var(--shadow-ios);
+            backdrop-filter: blur(24px) saturate(1.4);
+            -webkit-backdrop-filter: blur(24px) saturate(1.4);
+        }
+
+        .today-name {
+            font-size: 22px;
+            letter-spacing: -0.045em;
+        }
+
+        .today-icon,
+        .icon-box {
+            border-radius: 18px;
+            background:
+                radial-gradient(circle at 34% 20%, rgba(255,255,255,0.22), transparent 34%),
+                var(--icon-main-color);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.18),
+                0 0 24px var(--icon-glow);
+        }
+
+        .card {
+            border-radius: 28px;
+            padding: 21px;
+            margin-bottom: 15px;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.035)),
+                rgba(12,12,15,0.50);
+            border: 1px solid var(--hairline-soft);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.10),
+                0 16px 38px rgba(0,0,0,0.26);
+            backdrop-filter: blur(var(--card-blur)) saturate(1.32);
+            -webkit-backdrop-filter: blur(var(--card-blur)) saturate(1.32);
+        }
+
+        .card h3 {
+            line-height: 1.18;
+            letter-spacing: -0.03em;
+        }
+
+        .card.is-live {
+            border-color: color-mix(in srgb, var(--icon-main-color), white 24%);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.14),
+                0 0 26px color-mix(in srgb, var(--icon-glow), transparent 40%),
+                0 16px 38px rgba(0,0,0,0.28);
+        }
+
+        .badge {
+            border-radius: 999px;
+            background: rgba(255,255,255,0.075);
+            border: 1px solid rgba(255,255,255,0.08);
+            letter-spacing: 0.045em;
+        }
+
+        .badge-live {
+            background: var(--icon-main-color);
+            box-shadow: 0 0 18px var(--icon-glow);
+        }
+
+        .day-title {
+            margin: 28px 0 13px 5px;
+            font-size: 28px;
+            letter-spacing: -0.05em;
+        }
+
+        .admin-topbar {
+            background: rgba(12,12,16,0.96);
+        }
+
+        .admin-tabs {
+            padding: 4px 16px 0;
+            gap: 6px;
+        }
+
+        .admin-tab {
+            border-radius: 14px 14px 0 0;
+        }
+
+        .admin-tab.active {
+            background: rgba(255,255,255,0.085);
+        }
+
+        .admin-card,
+        .admin-tool-card,
+        .admin-stat {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.035)),
+                rgba(18,18,22,0.72);
+            border-color: rgba(255,255,255,0.105);
+        }
+
+        .admin-input,
+        .ai-input,
+        #authModal .modal-input,
+        .admin-import-area,
+        #exportArea {
+            background: rgba(255,255,255,0.075);
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        @media (max-width: 430px) {
+            .header-islands {
+                padding-left: 12px;
+                padding-right: 12px;
+                gap: 8px;
+            }
+
+            .month-text {
+                font-size: 22px;
+            }
+
+            .theme-btn,
+            .game-btn,
+            .ai-open-btn {
+                width: 45px;
+                height: 45px;
+            }
+
+            .view-btn {
+                width: 37px;
+                height: 37px;
+            }
+
+            .card {
+                border-radius: 25px;
+                padding: 19px;
+            }
+        }
+        /* ===== END IOS 28 POLISH ===== */
+
+
+
+        /* ===== DESIGNER CONTROL SURFACE ===== */
+        :root {
+            --designer-island-fill: 0.62;
+            --designer-island-shine: 0.10;
+            --designer-island-blur: 28px;
+            --designer-island-border: 0.14;
+            --designer-island-shadow: 0.24;
+            --designer-island-radius: 26px;
+            --designer-card-fill: 0.50;
+            --designer-card-shine: 0.08;
+            --designer-card-blur: 24px;
+            --designer-card-border: 0.075;
+            --designer-card-shadow: 0.26;
+            --designer-card-radius: 28px;
+            --designer-panel-fill: 0.88;
+            --designer-panel-shine: 0.07;
+            --designer-panel-blur: 34px;
+            --designer-panel-border: 0.15;
+            --designer-panel-shadow: 0.42;
+            --designer-panel-radius: 28px;
+        }
+
+        .island,
+        .theme-btn,
+        .game-btn,
+        .ai-open-btn,
+        .view-btn,
+        .nav-btn,
+        .schedule-search {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,var(--designer-island-shine)), rgba(255,255,255,0.035)),
+                rgba(18,18,22,var(--designer-island-fill)) !important;
+            border-color: rgba(255,255,255,var(--designer-island-border)) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.14),
+                0 14px 34px rgba(0,0,0,var(--designer-island-shadow)) !important;
+            backdrop-filter: blur(var(--designer-island-blur)) saturate(1.42) !important;
+            -webkit-backdrop-filter: blur(var(--designer-island-blur)) saturate(1.42) !important;
+        }
+
+        .island { border-radius: var(--designer-island-radius) !important; }
+        .island-week { border-radius: calc(var(--designer-island-radius) - 5px) !important; }
+        .theme-btn, .game-btn, .ai-open-btn { border-radius: calc(var(--designer-island-radius) - 8px) !important; }
+        .view-btn { border-radius: calc(var(--designer-island-radius) - 11px) !important; }
+
+        .card,
+        .today-hero,
+        .empty-state {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,var(--designer-card-shine)), rgba(255,255,255,0.025)),
+                rgba(12,12,15,var(--designer-card-fill)) !important;
+            border-color: rgba(255,255,255,var(--designer-card-border)) !important;
+            border-radius: var(--designer-card-radius) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.09),
+                0 16px 38px rgba(0,0,0,var(--designer-card-shadow)) !important;
+            backdrop-filter: blur(var(--designer-card-blur)) saturate(1.28) !important;
+            -webkit-backdrop-filter: blur(var(--designer-card-blur)) saturate(1.28) !important;
+        }
+
+        .admin-topbar,
+        .admin-tabs,
+        .admin-card,
+        .admin-tool-card,
+        .admin-stat,
+        .modal-card,
+        .export-card,
+        .game-card,
+        .ai-container,
+        .theme-menu,
+        .action-sheet {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,var(--designer-panel-shine)), rgba(255,255,255,0.025)),
+                rgba(18,18,22,var(--designer-panel-fill)) !important;
+            border-color: rgba(255,255,255,var(--designer-panel-border)) !important;
+            border-radius: var(--designer-panel-radius);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.10),
+                0 20px 48px rgba(0,0,0,var(--designer-panel-shadow)) !important;
+            backdrop-filter: blur(var(--designer-panel-blur)) saturate(1.35) !important;
+            -webkit-backdrop-filter: blur(var(--designer-panel-blur)) saturate(1.35) !important;
+        }
+
+        .theme-menu {
+            max-width: 680px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 1px solid rgba(255,255,255,var(--designer-panel-border));
+            border-right: 1px solid rgba(255,255,255,var(--designer-panel-border));
+        }
+
+        .theme-menu.open { bottom: 0; }
+
+        .designer-panel { display: grid; gap: 12px; margin-top: 18px; }
+        .designer-card { background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.095); border-radius: 18px; padding: 14px; }
+        .designer-card-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #fff; font-size: 13px; font-weight: 900; letter-spacing: 0.02em; text-transform: uppercase; margin-bottom: 12px; }
+        .designer-card-title small { color: var(--text-secondary); font-size: 10px; font-weight: 800; text-transform: none; }
+        .designer-chip-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+        .designer-chip { background: rgba(255,255,255,0.075); border: 1px solid rgba(255,255,255,0.10); color: #fff; border-radius: 13px; padding: 11px 8px; font-size: 11px; font-weight: 850; }
+        .designer-control { display: grid; grid-template-columns: 92px 1fr 38px; gap: 10px; align-items: center; margin-top: 9px; }
+        .designer-control span { color: var(--text-secondary); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+        .designer-control output { color: #fff; font-size: 11px; font-weight: 850; text-align: right; }
+        .designer-control input[type="range"] { width: 100%; accent-color: var(--icon-main-color); }
+        .designer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+        .designer-actions button { border: none; border-radius: 15px; padding: 14px 10px; color: #fff; font-size: 12px; font-weight: 900; }
+        .designer-reset-btn { background: rgba(255,255,255,0.10); }
+        .designer-save-btn { background: var(--icon-main-color); box-shadow: 0 0 18px var(--icon-glow); }
+
+        @media (max-width: 430px) {
+            .designer-control { grid-template-columns: 78px 1fr 32px; gap: 8px; }
+            .designer-chip-row, .designer-actions { grid-template-columns: 1fr; }
+        }
+        /* ===== END DESIGNER CONTROL SURFACE ===== */
+
     </style>
 </head>
 <body class="hide-locked">
-    <div class="action-sheet-overlay" id="daySheetOverlay" onclick="toggleDaySheet()">
-    <div class="action-sheet" id="daySheet">
-        <div style="text-align:center; color:var(--text-secondary); font-size:13px; font-weight:700; margin-bottom:15px; text-transform:uppercase;">Выберите день недели</div>
-        <button class="as-btn" onclick="selectDay(1, 'Понедельник')">Понедельник</button>
-        <button class="as-btn" onclick="selectDay(2, 'Вторник')">Вторник</button>
-        <button class="as-btn" onclick="selectDay(3, 'Среда')">Среда</button>
-        <button class="as-btn" onclick="selectDay(4, 'Четверг')">Четверг</button>
-        <button class="as-btn" onclick="selectDay(5, 'Пятница')">Пятница</button>
-        <button class="as-btn" onclick="selectDay(6, 'Суббота')">Суббота</button>
-        <button class="as-btn" style="background:rgba(255,255,255,0.15); color:var(--ios-pink); margin-top:10px;" onclick="toggleDaySheet()">Отмена</button>
-    </div>
-</div>
 
 <div class="bg-glow" id="bgGlow"></div>
 
@@ -497,7 +943,47 @@
     <div class="color-row" id="rowIconGlow"></div>
     <span class="label-theme">ПРОЗРАЧНОСТЬ БЛОКОВ РАСПИСАНИЯ</span>
     <input type="range" min="1" max="40" id="glassSlider" style="width:100%; accent-color:var(--ios-pink);" oninput="updateOpacity(this.value)">
-    <button onclick="toggleMenu()" style="width:100%; margin-top:30px; background:var(--ios-pink); border:none; color:#fff; padding:18px; border-radius:20px; font-weight:800;">ПРИМЕНИТЬ</button>
+    
+    <div class="designer-panel" id="designerPanel">
+        <div class="designer-card">
+            <div class="designer-card-title">Островки <small>верх, поиск, кнопки</small></div>
+            <div class="designer-chip-row">
+                <button class="designer-chip" onclick="applyDesignPreset('soft')">Мягко</button>
+                <button class="designer-chip" onclick="applyDesignPreset('glass')">Стекло</button>
+                <button class="designer-chip" onclick="applyDesignPreset('flat')">Плоско</button>
+            </div>
+            <label class="designer-control"><span>Стекло</span><input type="range" min="0" max="100" data-design-key="islandGlass" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Blur</span><input type="range" min="0" max="60" data-design-key="islandBlur" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Тень</span><input type="range" min="0" max="80" data-design-key="islandShadow" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Обводка</span><input type="range" min="0" max="40" data-design-key="islandBorder" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Радиус</span><input type="range" min="10" max="40" data-design-key="islandRadius" oninput="updateDesignControl(this)"><output></output></label>
+        </div>
+
+        <div class="designer-card">
+            <div class="designer-card-title">Карточки <small>пары и ближайшая</small></div>
+            <label class="designer-control"><span>Стекло</span><input type="range" min="0" max="100" data-design-key="cardGlass" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Blur</span><input type="range" min="0" max="60" data-design-key="cardBlur" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Тень</span><input type="range" min="0" max="80" data-design-key="cardShadow" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Обводка</span><input type="range" min="0" max="40" data-design-key="cardBorder" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Радиус</span><input type="range" min="10" max="42" data-design-key="cardRadius" oninput="updateDesignControl(this)"><output></output></label>
+        </div>
+
+        <div class="designer-card">
+            <div class="designer-card-title">Окна <small>админка, игра, AI</small></div>
+            <label class="designer-control"><span>Стекло</span><input type="range" min="0" max="100" data-design-key="panelGlass" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Blur</span><input type="range" min="0" max="70" data-design-key="panelBlur" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Тень</span><input type="range" min="0" max="90" data-design-key="panelShadow" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Обводка</span><input type="range" min="0" max="40" data-design-key="panelBorder" oninput="updateDesignControl(this)"><output></output></label>
+            <label class="designer-control"><span>Радиус</span><input type="range" min="12" max="42" data-design-key="panelRadius" oninput="updateDesignControl(this)"><output></output></label>
+        </div>
+
+        <div class="designer-actions">
+            <button class="designer-reset-btn" onclick="resetDesignTuning()">СБРОСИТЬ ВИД</button>
+            <button class="designer-save-btn" onclick="saveDesignTuning(); toggleMenu();">СОХРАНИТЬ</button>
+        </div>
+    </div>
+
+    <button onclick="toggleMenu()" style="width:100%; margin-top:18px; background:var(--ios-pink); border:none; color:#fff; padding:18px; border-radius:20px; font-weight:800;">ПРИМЕНИТЬ</button>
 </div>
 
 <div class="admin-overlay" id="adminPanel">
@@ -512,14 +998,23 @@
     <div class="admin-tabs">
         <button class="admin-tab active" id="tabList" onclick="switchAdminTab('list')">📋 Список</button>
         <button class="admin-tab" id="tabAdd" onclick="switchAdminTab('add')">➕ Добавить</button>
+        <button class="admin-tab" id="tabTools" onclick="switchAdminTab('tools')">🧰 Инструм.</button>
     </div>
 
     <!-- BODY -->
     <div class="admin-body">
 
         <!-- LIST PANEL -->
-        <div class="admin-list-panel" id="adminList">
-            <div class="admin-empty">Загрузка...</div>
+        <div class="admin-list-panel" id="adminListPanel">
+            <div class="admin-stats">
+                <div class="admin-stat"><div class="admin-stat-num" id="statLessons">0</div><div class="admin-stat-label">пар всего</div></div>
+                <div class="admin-stat"><div class="admin-stat-num" id="statWeek">0</div><div class="admin-stat-label">на этой неделе</div></div>
+                <div class="admin-stat"><div class="admin-stat-num" id="statToday">0</div><div class="admin-stat-label">сегодня</div></div>
+            </div>
+            <input type="text" id="adminSearch" class="admin-input admin-list-search" placeholder="Поиск по предмету, аудитории, преподу..." oninput="renderAdminList()">
+            <div id="adminList">
+                <div class="admin-empty">Загрузка...</div>
+            </div>
         </div>
 
         <!-- ADD FORM PANEL -->
@@ -578,8 +1073,37 @@
 
             <div class="admin-divider"></div>
 
-            <button class="admin-btn-add" onclick="validateAndAdd()">+ ДОБАВИТЬ В РАСПИСАНИЕ</button>
+            <button class="admin-btn-add" id="saveLessonBtn" onclick="validateAndAdd()">+ ДОБАВИТЬ В РАСПИСАНИЕ</button>
+            <button class="admin-btn-neutral" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">ОТМЕНИТЬ РЕДАКТИРОВАНИЕ</button>
             <button class="admin-btn-export" onclick="openExport()">ЭКСПОРТ ДАННЫХ 🚀</button>
+        </div>
+
+        <!-- TOOLS PANEL -->
+        <div class="admin-tools-panel" id="adminToolsPanel">
+            <div class="admin-tool-card">
+                <div class="admin-tool-title">Импорт расписания из JSON</div>
+                <div class="admin-tool-desc">Вставь код из экспорта. На GitHub Pages это обновит расписание на этом устройстве; чтобы обновить у всех, экспортированный код все равно нужно вставить в файл на GitHub.</div>
+                <textarea id="importArea" class="admin-import-area" placeholder='[{"d":1,"t":"08:30 - 10:00","s":"Предмет","r":"262","p":"Препод","w":[1,17],"i":"📚"}]'></textarea>
+                <div class="admin-btn-row" style="margin-top:10px;">
+                    <button class="admin-btn-add" onclick="importSchedule('replace')">ЗАМЕНИТЬ</button>
+                    <button class="admin-btn-neutral" onclick="importSchedule('merge')">ДОБАВИТЬ</button>
+                </div>
+            </div>
+
+            <div class="admin-tool-card">
+                <div class="admin-tool-title">Календарь и напоминания</div>
+                <div class="admin-tool-desc">Можно скачать .ics для календаря или включить разовое уведомление о ближайшей паре. Уведомления работают пока страница открыта.</div>
+                <div class="admin-btn-row">
+                    <button class="admin-btn-export" onclick="downloadICS()">СКАЧАТЬ .ICS</button>
+                    <button class="admin-btn-neutral" onclick="notifyNextLesson()">НАПОМНИТЬ</button>
+                </div>
+            </div>
+
+            <div class="admin-tool-card">
+                <div class="admin-tool-title">Локальные правки</div>
+                <div class="admin-tool-desc">Все добавления, удаления, импорт и редактирование сохраняются в браузере. Если нужно вернуться к расписанию из файла, сбрось локальную копию.</div>
+                <button class="admin-btn-danger" onclick="resetLocalSchedule()">СБРОСИТЬ ЛОКАЛЬНЫЕ ПРАВКИ</button>
+            </div>
         </div>
 
     </div>
@@ -614,7 +1138,7 @@
 </div>
 
 <div class="action-sheet-overlay" id="daySheetOverlay" onclick="toggleDaySheet()">
-    <div class="action-sheet" id="daySheet">
+    <div class="action-sheet" id="daySheet" onclick="event.stopPropagation()">
         <div style="text-align:center; color:var(--text-secondary); font-size:13px; font-weight:700; margin-bottom:15px; text-transform:uppercase;">Выберите день недели</div>
         <button class="as-btn" onclick="selectDay(1, 'Понедельник')">Понедельник</button>
         <button class="as-btn" onclick="selectDay(2, 'Вторник')">Вторник</button>
@@ -642,6 +1166,7 @@
     </div>
 
     <div class="island island-controls">
+        <button class="view-btn" id="btnToday" onclick="setViewMode('today')">📍</button>
         <button class="view-btn" id="btnShowAll" onclick="setViewMode('all')">🙉</button>
         <button class="view-btn active" id="btnHideLocked" onclick="setViewMode('clean')">🙈</button>
     </div>
@@ -656,10 +1181,19 @@
     </div>
 </div>
 
+<div class="schedule-tools">
+    <input type="text" id="scheduleSearch" class="schedule-search" placeholder="Найти предмет, аудиторию или препода..." oninput="render()">
+
+</div>
+
 <div class="container" id="scheduleRoot"></div>
+<div class="toast" id="toast"></div>
 
 <script>
     const START_DATE = new Date('2026-02-09T00:00:00');
+    const SCHEDULE_STORAGE_KEY = 'sumbul_schedule_override_v1';
+    let editingIndex = -1;
+    let activeViewMode = 'clean';
     
     let schedule = [
         { d: 1, t: "08:30 - 10:00", s: "Осн. композиции и дизайна", r: "262", p: "Кринская З.А.", w: [16,17], i: "📐" },
@@ -708,6 +1242,132 @@
         { d: 6, t: "17:30 - 19:00", s: "Информационные технологии", r: "473", p: "Алехандро", w: [10,17], i: "📱" }
     ];
 
+    const baseSchedule = JSON.parse(JSON.stringify(schedule));
+
+    function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>"']/g, ch => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[ch]));
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        if(!toast) return;
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+
+    function normalizeLesson(raw) {
+        const lesson = {
+            d: Number(raw.d),
+            t: String(raw.t || '').trim(),
+            s: String(raw.s || '').trim(),
+            r: String(raw.r || '').trim(),
+            p: String(raw.p || '').trim(),
+            w: Array.isArray(raw.w) ? [Number(raw.w[0]), Number(raw.w[1])] : [Number(raw.w1), Number(raw.w2)],
+            i: String(raw.i || '📚').trim() || '📚'
+        };
+        if(!Number.isInteger(lesson.d) || lesson.d < 1 || lesson.d > 6) throw new Error('Некорректный день недели');
+        if(!lesson.t || !lesson.s) throw new Error('У каждой пары нужны время и предмет');
+        if(!Number.isFinite(lesson.w[0])) throw new Error('Некорректная начальная неделя');
+        if(!Number.isFinite(lesson.w[1])) lesson.w[1] = lesson.w[0];
+        if(lesson.w[1] < lesson.w[0]) lesson.w = [lesson.w[1], lesson.w[0]];
+        return lesson;
+    }
+
+    function sortSchedule() {
+        schedule.sort((a, b) => a.d - b.d || a.t.localeCompare(b.t, 'ru') || a.s.localeCompare(b.s, 'ru'));
+    }
+
+    function saveScheduleLocal() {
+        localStorage.setItem(SCHEDULE_STORAGE_KEY, JSON.stringify(schedule));
+    }
+
+    function loadScheduleLocal() {
+        const saved = localStorage.getItem(SCHEDULE_STORAGE_KEY);
+        if(!saved) return;
+        try {
+            const parsed = JSON.parse(saved);
+            if(!Array.isArray(parsed)) throw new Error('JSON должен быть массивом');
+            schedule = parsed.map(normalizeLesson);
+            sortSchedule();
+        } catch (e) {
+            localStorage.removeItem(SCHEDULE_STORAGE_KEY);
+            console.warn('Не удалось загрузить локальное расписание', e);
+        }
+    }
+
+    function getCurrentDayNumber() {
+        const day = new Date().getDay();
+        return day === 0 ? 7 : day;
+    }
+
+    function getWeekLessons(week = currentWeek) {
+        return schedule.filter(l => week >= l.w[0] && week <= l.w[1]);
+    }
+
+    function makeLessonDate(lesson, week, end = false) {
+        const base = new Date(START_DATE);
+        base.setDate(base.getDate() + (week - 1) * 7 + (lesson.d - 1));
+        const part = lesson.t.split(' - ')[end ? 1 : 0] || lesson.t.split(' - ')[0];
+        const [h, m] = part.split(':').map(Number);
+        base.setHours(h || 0, m || 0, 0, 0);
+        return base;
+    }
+
+    function getNextLesson() {
+        const now = new Date();
+        return schedule
+            .flatMap(l => {
+                const from = Math.max(l.w[0], realWeek);
+                const to = Math.min(l.w[1], realWeek + 2);
+                const items = [];
+                for(let w = from; w <= to; w++) {
+                    const start = makeLessonDate(l, w);
+                    if(start >= now) items.push({ lesson: l, week: w, start });
+                }
+                return items;
+            })
+            .sort((a, b) => a.start - b.start)[0] || null;
+    }
+
+    function formatDateTime(date) {
+        return date.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' }) + ' в ' +
+            date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function lessonMatchesQuery(lesson, query) {
+        if(!query) return true;
+        const haystack = [lesson.s, lesson.r, lesson.p, lesson.t, dayFull[lesson.d]].join(' ').toLowerCase();
+        return haystack.includes(query.toLowerCase());
+    }
+
+    function installPwaManifest() {
+        const manifest = {
+            name: 'Расписание КФУ',
+            short_name: 'КФУ',
+            start_url: './',
+            scope: './',
+            display: 'standalone',
+            background_color: '#000000',
+            theme_color: '#000000',
+            icons: [
+                {
+                    src: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#000"/><circle cx="166" cy="166" r="120" fill="#ff375f" opacity=".9"/><circle cx="346" cy="346" r="130" fill="#007aff" opacity=".78"/><text x="256" y="294" text-anchor="middle" font-size="158" font-family="Arial" font-weight="900" fill="#fff">К</text></svg>'),
+                    sizes: '512x512',
+                    type: 'image/svg+xml',
+                    purpose: 'any maskable'
+                }
+            ]
+        };
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = 'data:application/manifest+json,' + encodeURIComponent(JSON.stringify(manifest));
+        document.head.appendChild(link);
+    }
+
     // --- NEW AUTH LOGIC (iOS STYLE) ---
     function openAuth() { document.getElementById('authModal').style.display = 'flex'; document.getElementById('adminPassInput').focus(); }
     function closeAuth() { document.getElementById('authModal').style.display = 'none'; document.getElementById('adminPassInput').value = ''; }
@@ -739,6 +1399,24 @@
         document.getElementById('addD').value = val;
         document.getElementById('daySelectorBtn').innerText = name + ' ▾';
         toggleDaySheet();
+    }
+
+    function fillLessonForm(lesson) {
+        document.getElementById('addS').value = lesson.s || '';
+        document.getElementById('addI').value = lesson.i || '';
+        document.getElementById('addT').value = lesson.t || '';
+        document.getElementById('addD').value = lesson.d || 1;
+        document.getElementById('daySelectorBtn').innerText = (dayFull[lesson.d] || 'Выбрать день') + ' ▾';
+        document.getElementById('addR').value = lesson.r || '';
+        document.getElementById('addP').value = lesson.p || '';
+        document.getElementById('addW1').value = lesson.w?.[0] || '';
+        document.getElementById('addW2').value = lesson.w?.[1] || '';
+    }
+
+    function clearLessonForm() {
+        ['addS','addI','addT','addR','addP','addW1','addW2'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('addD').value = '1';
+        document.getElementById('daySelectorBtn').innerText = 'Выбрать день ▾';
     }
     function checkAuth() {
         const pass = document.getElementById('adminPassInput').value;
@@ -776,21 +1454,23 @@
     let conflictIndex = -1;
 
     function validateAndAdd() {
-        const s = document.getElementById('addS').value;
-        const i = document.getElementById('addI').value;
-        const t = document.getElementById('addT').value;
+        const s = document.getElementById('addS').value.trim();
+        const i = document.getElementById('addI').value.trim();
+        const t = document.getElementById('addT').value.trim();
         const d = parseInt(document.getElementById('addD').value);
-        const r = document.getElementById('addR').value;
-        const p = document.getElementById('addP').value;
+        const r = document.getElementById('addR').value.trim();
+        const p = document.getElementById('addP').value.trim();
         const w1 = parseInt(document.getElementById('addW1').value);
-        const w2 = parseInt(document.getElementById('addW2').value);
+        const w2raw = parseInt(document.getElementById('addW2').value);
+        const w2 = Number.isFinite(w2raw) ? w2raw : w1;
 
         if(!s || !t || !d || isNaN(w1)) { alert("Заполни важные поля!"); return; }
+        if(!/^\d{2}:\d{2}\s-\s\d{2}:\d{2}$/.test(t)) { alert("Время лучше писать так: 08:30 - 10:00"); return; }
 
-        pendingLesson = { d, t, s, r, p, w: [w1, w2], i: i || "📚" };
+        pendingLesson = normalizeLesson({ d, t, s, r, p, w: [w1, w2], i: i || "📚" });
         
         // Проверка коллизий
-        conflictIndex = schedule.findIndex(l => l.d === d && l.t === t);
+        conflictIndex = schedule.findIndex((l, idx) => idx !== editingIndex && l.d === d && l.t === t);
 
         if(conflictIndex !== -1) {
             const old = schedule[conflictIndex];
@@ -805,17 +1485,27 @@
     }
 
     function addLessonFinal(mode) {
-        if(mode === 'replace') schedule.splice(conflictIndex, 1);
+        if(mode === 'replace') {
+            schedule.splice(conflictIndex, 1);
+            if(editingIndex > conflictIndex) editingIndex--;
+        }
         
-        schedule.push(pendingLesson);
+        if(editingIndex >= 0) {
+            schedule[editingIndex] = pendingLesson;
+            showToast('Пара обновлена');
+        } else {
+            schedule.push(pendingLesson);
+            showToast('Пара добавлена');
+        }
+        sortSchedule();
+        saveScheduleLocal();
         closeConflict();
+        cancelEdit(false);
         renderAdminList();
+        updateAdminStats();
         render();
         switchAdminTab('list');
         
-        // Очистка полей
-        ['addS','addI','addT','addR','addP','addW1','addW2'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('daySelectorBtn').innerText = 'Выбрать день ▾';
         pendingLesson = null;
         conflictIndex = -1;
     }
@@ -823,20 +1513,22 @@
     function closeConflict() { document.getElementById('conflictModal').style.display = 'none'; }
 
     function switchAdminTab(tab) {
-        const listPanel = document.getElementById('adminList');
+        const listPanel = document.getElementById('adminListPanel');
         const addPanel = document.getElementById('adminAddPanel');
+        const toolsPanel = document.getElementById('adminToolsPanel');
         const tabList = document.getElementById('tabList');
         const tabAdd = document.getElementById('tabAdd');
+        const tabTools = document.getElementById('tabTools');
+
+        listPanel.style.display = tab === 'list' ? '' : 'none';
+        addPanel.classList.toggle('active', tab === 'add');
+        toolsPanel.classList.toggle('active', tab === 'tools');
+        tabList.classList.toggle('active', tab === 'list');
+        tabAdd.classList.toggle('active', tab === 'add');
+        tabTools.classList.toggle('active', tab === 'tools');
         if(tab === 'list') {
-            listPanel.style.display = '';
-            addPanel.classList.remove('active');
-            tabList.classList.add('active');
-            tabAdd.classList.remove('active');
-        } else {
-            listPanel.style.display = 'none';
-            addPanel.classList.add('active');
-            tabList.classList.remove('active');
-            tabAdd.classList.add('active');
+            renderAdminList();
+            updateAdminStats();
         }
     }
 
@@ -846,28 +1538,65 @@
     const dayNames = ['', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
     const dayFull = ['', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
+    function updateAdminStats() {
+        const currentDay = getCurrentDayNumber();
+        const weekLessons = getWeekLessons(currentWeek);
+        document.getElementById('statLessons').innerText = schedule.length;
+        document.getElementById('statWeek').innerText = weekLessons.length;
+        document.getElementById('statToday').innerText = weekLessons.filter(l => l.d === currentDay).length;
+    }
+
     function renderAdminList() {
         const list = document.getElementById('adminList');
-        if(schedule.length === 0) { list.innerHTML = '<div class="admin-empty">Пока пусто</div>'; return; }
-        list.innerHTML = schedule.map((l, i) => `
+        const query = document.getElementById('adminSearch')?.value.trim().toLowerCase() || '';
+        const filtered = schedule
+            .map((lesson, index) => ({ lesson, index }))
+            .filter(({ lesson }) => lessonMatchesQuery(lesson, query));
+        updateAdminStats();
+        if(filtered.length === 0) { list.innerHTML = '<div class="admin-empty">Ничего не найдено</div>'; return; }
+        list.innerHTML = filtered.map(({ lesson: l, index: i }) => `
             <div class="admin-card">
-                <div class="admin-card-icon">${l.i}</div>
+                <div class="admin-card-icon">${escapeHTML(l.i)}</div>
                 <div class="admin-card-info">
-                    <div class="admin-card-title">${l.s}</div>
-                    <div class="admin-card-meta">${l.t} · Ауд. ${l.r}</div>
-                    <div class="admin-card-meta">${l.p} · Нед. ${l.w[0]}–${l.w[1]}</div>
+                    <div class="admin-card-title">${escapeHTML(l.s)}</div>
+                    <div class="admin-card-meta">${escapeHTML(l.t)} · Ауд. ${escapeHTML(l.r || '—')}</div>
+                    <div class="admin-card-meta">${escapeHTML(l.p || '—')} · Нед. ${escapeHTML(l.w[0])}–${escapeHTML(l.w[1])}</div>
                 </div>
-                <span class="admin-card-day">${dayNames[l.d]}</span>
-                <button class="admin-del-btn" onclick="deleteLesson(${i})">✕</button>
+                <span class="admin-card-day">${escapeHTML(dayNames[l.d])}</span>
+                <div class="admin-card-actions">
+                    <button class="admin-edit-btn" onclick="editLesson(${i})">ИЗМ</button>
+                    <button class="admin-del-btn" onclick="deleteLesson(${i})">✕</button>
+                </div>
             </div>
         `).join('');
+    }
+
+    function editLesson(index) {
+        editingIndex = index;
+        fillLessonForm(schedule[index]);
+        const btn = document.getElementById('saveLessonBtn');
+        btn.innerText = 'СОХРАНИТЬ ИЗМЕНЕНИЯ';
+        btn.classList.add('is-editing');
+        document.getElementById('cancelEditBtn').style.display = 'block';
+        switchAdminTab('add');
+    }
+
+    function cancelEdit(clear = true) {
+        editingIndex = -1;
+        const btn = document.getElementById('saveLessonBtn');
+        btn.innerText = '+ ДОБАВИТЬ В РАСПИСАНИЕ';
+        btn.classList.remove('is-editing');
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        if(clear) clearLessonForm();
     }
 
     function deleteLesson(index) {
         if(confirm("Удалить эту пару?")) {
             schedule.splice(index, 1);
+            saveScheduleLocal();
             renderAdminList();
             render();
+            showToast('Пара удалена');
         }
     }
 
@@ -878,6 +1607,87 @@
     }
 
     function closeExport() { document.getElementById('exportModal').style.display = 'none'; }
+
+    function importSchedule(mode) {
+        const area = document.getElementById('importArea');
+        try {
+            const parsed = JSON.parse(area.value);
+            if(!Array.isArray(parsed)) throw new Error('Нужен массив пар');
+            const incoming = parsed.map(normalizeLesson);
+            if(mode === 'replace') schedule = incoming;
+            else schedule = schedule.concat(incoming);
+            sortSchedule();
+            saveScheduleLocal();
+            renderAdminList();
+            render();
+            area.value = '';
+            showToast(mode === 'replace' ? 'Расписание заменено' : 'Пары добавлены');
+            switchAdminTab('list');
+        } catch (e) {
+            alert('Не получилось импортировать: ' + e.message);
+        }
+    }
+
+    function resetLocalSchedule() {
+        if(!confirm('Вернуться к расписанию, которое зашито в файл?')) return;
+        schedule = JSON.parse(JSON.stringify(baseSchedule));
+        localStorage.removeItem(SCHEDULE_STORAGE_KEY);
+        sortSchedule();
+        renderAdminList();
+        render();
+        showToast('Локальные правки сброшены');
+    }
+
+    function toICSDate(date) {
+        return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    }
+
+    function downloadICS() {
+        const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//KAZ1NAK//KFU Schedule//RU', 'CALSCALE:GREGORIAN'];
+        schedule.forEach((lesson, idx) => {
+            for(let w = lesson.w[0]; w <= lesson.w[1]; w++) {
+                const start = makeLessonDate(lesson, w);
+                const end = makeLessonDate(lesson, w, true);
+                lines.push('BEGIN:VEVENT');
+                lines.push('UID:kfu-' + idx + '-' + w + '@kaz1nak');
+                lines.push('DTSTAMP:' + toICSDate(new Date()));
+                lines.push('DTSTART:' + toICSDate(start));
+                lines.push('DTEND:' + toICSDate(end));
+                lines.push('SUMMARY:' + lesson.s.replace(/\n/g, ' '));
+                lines.push('LOCATION:' + lesson.r.replace(/\n/g, ' '));
+                lines.push('DESCRIPTION:' + ('Преподаватель: ' + lesson.p + '; неделя ' + w).replace(/\n/g, ' '));
+                lines.push('END:VEVENT');
+            }
+        });
+        lines.push('END:VCALENDAR');
+        const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'raspisanie-kfu.ics';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('Календарь скачан');
+    }
+
+    function notifyNextLesson() {
+        const next = getNextLesson();
+        if(!next) { showToast('Ближайших пар не найдено'); return; }
+        if(!('Notification' in window)) { showToast('Браузер не поддерживает уведомления'); return; }
+        Notification.requestPermission().then(permission => {
+            if(permission !== 'granted') { showToast('Уведомления не разрешены'); return; }
+            const delay = Math.max(1000, next.start - new Date() - 20 * 60000);
+            setTimeout(() => {
+                new Notification('Скоро пара', {
+                    body: `${next.lesson.s} · ${next.lesson.t} · ауд. ${next.lesson.r}`,
+                    icon: ''
+                });
+            }, delay);
+            showToast('Напомню за 20 минут, если страница будет открыта');
+        });
+    }
 
     function copyExport() {
         const area = document.getElementById('exportArea');
@@ -894,7 +1704,7 @@
 
     // --- OTHER CORE FUNCTIONS ---
     function formatMarkdown(t) {
-        return t.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+        return escapeHTML(t).replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em>$1</em>');
     }
@@ -910,7 +1720,7 @@
         const text = input.value.trim();
         if (!text) return;
 
-        chat.innerHTML += `<div class="ai-msg user">${formatMarkdown(text)}</div>`;
+        chat.insertAdjacentHTML('beforeend', `<div class="ai-msg user">${formatMarkdown(text)}</div>`);
         input.value = '';
         chat.scrollTop = chat.scrollHeight;
 
@@ -927,11 +1737,120 @@
         chat.scrollTop = chat.scrollHeight;
     }
 
+
+
+    const DESIGN_STORAGE_KEY = 'sumbul_design_tuning_v2';
+    const DESIGN_DEFAULTS = {
+        islandGlass: 45, islandBlur: 28, islandShadow: 24, islandBorder: 14, islandRadius: 26,
+        cardGlass: 42, cardBlur: 24, cardShadow: 26, cardBorder: 8, cardRadius: 28,
+        panelGlass: 28, panelBlur: 34, panelShadow: 42, panelBorder: 15, panelRadius: 28
+    };
+
+    function lerp(a, b, t) { return a + (b - a) * (t / 100); }
+    function setRootVar(name, value) { document.documentElement.style.setProperty(name, value); }
+
+    function applyDesignValues(values) {
+        const v = { ...DESIGN_DEFAULTS, ...values };
+        setRootVar('--designer-island-fill', lerp(0.92, 0.34, v.islandGlass).toFixed(3));
+        setRootVar('--designer-island-shine', lerp(0.025, 0.16, v.islandGlass).toFixed(3));
+        setRootVar('--designer-island-blur', v.islandBlur + 'px');
+        setRootVar('--designer-island-shadow', (v.islandShadow / 100).toFixed(3));
+        setRootVar('--designer-island-border', (v.islandBorder / 100).toFixed(3));
+        setRootVar('--designer-island-radius', v.islandRadius + 'px');
+
+        setRootVar('--designer-card-fill', lerp(0.88, 0.28, v.cardGlass).toFixed(3));
+        setRootVar('--designer-card-shine', lerp(0.02, 0.15, v.cardGlass).toFixed(3));
+        setRootVar('--designer-card-blur', v.cardBlur + 'px');
+        setRootVar('--designer-card-shadow', (v.cardShadow / 100).toFixed(3));
+        setRootVar('--designer-card-border', (v.cardBorder / 100).toFixed(3));
+        setRootVar('--designer-card-radius', v.cardRadius + 'px');
+
+        setRootVar('--designer-panel-fill', lerp(0.96, 0.48, v.panelGlass).toFixed(3));
+        setRootVar('--designer-panel-shine', lerp(0.02, 0.13, v.panelGlass).toFixed(3));
+        setRootVar('--designer-panel-blur', v.panelBlur + 'px');
+        setRootVar('--designer-panel-shadow', (v.panelShadow / 100).toFixed(3));
+        setRootVar('--designer-panel-border', (v.panelBorder / 100).toFixed(3));
+        setRootVar('--designer-panel-radius', v.panelRadius + 'px');
+    }
+
+    function getDesignValuesFromControls() {
+        const values = {};
+        document.querySelectorAll('[data-design-key]').forEach(input => values[input.dataset.designKey] = Number(input.value));
+        return values;
+    }
+
+    function syncDesignControls(values = getSavedDesignValues()) {
+        document.querySelectorAll('[data-design-key]').forEach(input => {
+            input.value = values[input.dataset.designKey] ?? DESIGN_DEFAULTS[input.dataset.designKey];
+            const output = input.parentElement.querySelector('output');
+            if(output) output.textContent = input.value;
+        });
+    }
+
+    function getSavedDesignValues() {
+        return JSON.parse(localStorage.getItem(DESIGN_STORAGE_KEY) || 'null') || DESIGN_DEFAULTS;
+    }
+
+    function updateDesignControl(input) {
+        const output = input.parentElement.querySelector('output');
+        if(output) output.textContent = input.value;
+        const values = getDesignValuesFromControls();
+        applyDesignValues(values);
+        localStorage.setItem(DESIGN_STORAGE_KEY, JSON.stringify(values));
+    }
+
+    function saveDesignTuning() {
+        localStorage.setItem(DESIGN_STORAGE_KEY, JSON.stringify(getDesignValuesFromControls()));
+        showToast('Вид сохранен');
+    }
+
+    function loadDesignTuning() {
+        const values = getSavedDesignValues();
+        applyDesignValues(values);
+        syncDesignControls(values);
+    }
+
+    function resetDesignTuning() {
+        localStorage.removeItem(DESIGN_STORAGE_KEY);
+        applyDesignValues(DESIGN_DEFAULTS);
+        syncDesignControls(DESIGN_DEFAULTS);
+        showToast('Вид сброшен');
+    }
+
+    function applyDesignPreset(name) {
+        const presets = {
+            soft: { ...DESIGN_DEFAULTS },
+            glass: { islandGlass: 86, islandBlur: 46, islandShadow: 38, islandBorder: 22, islandRadius: 30, cardGlass: 82, cardBlur: 44, cardShadow: 42, cardBorder: 18, cardRadius: 32, panelGlass: 76, panelBlur: 52, panelShadow: 55, panelBorder: 20, panelRadius: 34 },
+            flat: { islandGlass: 0, islandBlur: 0, islandShadow: 0, islandBorder: 0, islandRadius: 18, cardGlass: 0, cardBlur: 0, cardShadow: 0, cardBorder: 0, cardRadius: 18, panelGlass: 0, panelBlur: 0, panelShadow: 0, panelBorder: 0, panelRadius: 18 }
+        };
+        const values = presets[name] || presets.soft;
+        applyDesignValues(values);
+        syncDesignControls(values);
+        localStorage.setItem(DESIGN_STORAGE_KEY, JSON.stringify(values));
+    }
+
     const gameTemplates = [
         { n: "HEART", c: ["#ff375f","#ff80ab"], d: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,1,1,1,1,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0] },
         { n: "CREEPER", c: ["#30d158","#000"], d: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,2,2,1,1,2,2,1,1,1,1,1,1,2,2,1,1,1,1,1,2,2,2,2,1,1,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] },
         { n: "SMILE", c: ["#ffcc00","#000"], d: [0,0,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,2,1,1,1,1,2,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,2,1,1,1,1,1,1,2,1,0,0,1,1,2,2,2,2,2,2,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,0,0,0] }
     ];
+
+
+
+    function artRows(name, colors, rows) {
+        return { n: name, c: colors, d: rows.join('').split('').map(Number) };
+    }
+
+    gameTemplates.push(
+        artRows("STAR", ["#ffcc00","#fff2a8"], ["000001000000","000011100000","000111110000","111222221111","011222221110","001122211000","001122211000","011200021100","110000000110"]),
+        artRows("CROWN", ["#ffcc00","#ff8a00","#ffffff"], ["000000000000","010000000010","011000001110","012100012110","012211222110","012222222110","001111111100","001222222100","000111111000"]),
+        artRows("DIAMOND", ["#5ac8fa","#007aff","#ffffff"], ["000011110000","000122221000","001232232100","012322223210","123222222321","012322223210","001232232100","000122221000","000011110000"]),
+        artRows("ROCKET", ["#ffffff","#ff375f","#007aff","#ffcc00"], ["000001100000","000012210000","000122221000","000122221000","001122221100","001123321100","001122221100","000142410000","000400040000"]),
+        artRows("MOON", ["#f2f2f7","#8e8e93"], ["000111100000","001111110000","011111000000","011110000000","011110000000","011111000000","001111110000","000111100000","000000000000"]),
+        artRows("FLOWER", ["#ff375f","#ffcc00","#30d158"], ["000001000000","000011100000","000112110000","000121210000","001112111000","000121210000","000112110000","000033300000","000003000000"]),
+        artRows("MUSIC", ["#af52de","#ffffff"], ["000000111000","000000121000","000000121000","000000121000","000000121000","000111121000","001222221000","001222100000","000111000000"]),
+        artRows("LIGHT", ["#ffcc00","#ffffff"], ["000001000000","000101010000","000011100000","001112111000","000122100000","000122100000","000011000000","000011000000","000000000000"])
+    );
 
     let currentArtIdx = 0, selectedColorIdx = null, artProgress = JSON.parse(localStorage.getItem('sumbul_art')) || {};
 
@@ -1025,12 +1944,15 @@
     let currentWeek = Math.max(1, Math.min(22, realWeek));
 
     function setViewMode(mode) {
-        document.body.classList.toggle('hide-locked', mode === 'clean');
+        activeViewMode = mode;
+        document.body.classList.toggle('hide-locked', mode === 'clean' || mode === 'today');
+        document.getElementById('btnToday').classList.toggle('active', mode === 'today');
         document.getElementById('btnHideLocked').classList.toggle('active', mode === 'clean');
         document.getElementById('btnShowAll').classList.toggle('active', mode === 'all');
+        render();
     }
 
-    function changeWeek(v) { currentWeek = Math.max(1, Math.min(22, currentWeek+v)); render(); }
+    function changeWeek(v) { currentWeek = Math.max(1, Math.min(22, currentWeek+v)); render(); updateAdminStats(); }
     function toggleMenu() { document.getElementById('themeMenu').classList.toggle('open'); }
     function toggleGame() { 
         const el = document.getElementById('gameOverlay'); el.style.display = el.style.display==='flex'?'none':'flex';
@@ -1056,35 +1978,89 @@
         return { label: `Через ${l.d - curDay} дн.`, class: "badge-timer", type: 'upcoming' };
     }
 
+    function renderTodayHero() {
+        const next = getNextLesson();
+        if(!next) {
+            return '<div class="today-hero"><div class="today-kicker">Ближайшая пара</div><div class="today-name">Пока ничего не найдено</div><div class="today-meta">Можно выдохнуть или проверить другую неделю.</div></div>';
+        }
+        return `<div class="today-hero" id="nextLessonCard">
+            <div class="today-hero-top">
+                <div>
+                    <div class="today-kicker">Ближайшая пара · ${escapeHTML(formatDateTime(next.start))}</div>
+                    <div class="today-name">${escapeHTML(next.lesson.s)}</div>
+                </div>
+                <div class="today-icon">${escapeHTML(next.lesson.i)}</div>
+            </div>
+            <div class="today-meta">${escapeHTML(next.lesson.t)} · ауд. ${escapeHTML(next.lesson.r || '—')} · ${escapeHTML(next.lesson.p || '—')} · нед. ${next.week}</div>
+        </div>`;
+    }
+
+    function renderLessonCard(l) {
+        const status = getSmartStatus(l, currentWeek);
+        const isLocked = status.type === 'locked';
+        return `<div class="card ${isLocked?'locked':''} ${status.type==='passed'?'is-passed':''} ${status.type==='live'?'is-live':''}">
+            ${isLocked?`<button style="position:absolute;right:15px;top:15px;width:35px;height:35px;background:rgba(255,255,255,0.1);border:none;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;" onclick="this.parentElement.classList.toggle('revealed')">👁️</button>`:''}
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:10px;"><span style="font-size:20px;font-weight:800;">${escapeHTML(l.t)}</span><span class="badge ${status.class}">${escapeHTML(status.label)}</span></div>
+            <div style="display:flex;gap:15px;align-items:center;">
+                <div class="icon-box">${escapeHTML(l.i)}</div>
+                <div><h3 style="margin:0;font-size:16px;">${escapeHTML(l.s)}</h3><p style="margin:4px 0 0;font-size:12px;color:var(--text-secondary);">${escapeHTML(l.r || '—')} • ${escapeHTML(l.p || '—')}</p></div>
+            </div>
+        </div>`;
+    }
+
     function render() {
         const root = document.getElementById('scheduleRoot');
         document.getElementById('weekNumDisplay').innerText = currentWeek;
         const now = new Date();
+        const query = document.getElementById('scheduleSearch')?.value.trim() || '';
+        const today = getCurrentDayNumber();
         document.getElementById('islandDay').innerText = now.toLocaleDateString('ru-RU', { weekday: 'long' });
         document.getElementById('islandDate').innerText = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
-        root.innerHTML = "";
+        root.innerHTML = renderTodayHero();
+        let rendered = 0;
         ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"].forEach((name, idx) => {
-            const items = schedule.filter(l => l.d === idx + 1);
-            if(!items.length) return;
+            const dayNumber = idx + 1;
+            if(activeViewMode === 'today' && dayNumber !== today) return;
+            const items = schedule
+                .filter(l => l.d === dayNumber)
+                .filter(l => lessonMatchesQuery(l, query));
+            if(!items.length) {
+                if(activeViewMode === 'today' && dayNumber === today) {
+                    root.insertAdjacentHTML('beforeend', '<div class="empty-state">На сегодня пар не найдено. Красиво живем.</div>');
+                }
+                return;
+            }
             const section = document.createElement('div');
-            section.innerHTML = `<div class="day-title">${name}</div>`;
-            items.forEach((l) => {
-                const status = getSmartStatus(l, currentWeek);
-                const isLocked = status.type === 'locked';
-                section.innerHTML += `<div class="card ${isLocked?'locked':''} ${status.type==='passed'?'is-passed':''} ${status.type==='live'?'is-live':''}">
-                    ${isLocked?`<div style=\"position:absolute;right:15px;top:15px;width:35px;height:35px;background:rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:10;\" onclick=\"this.parentElement.classList.toggle('revealed')\">👁️</div>`:''}
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;"><span style="font-size:20px;font-weight:800;">${l.t}</span><span class="badge ${status.class}">${status.label}</span></div>
-                    <div style="display:flex;gap:15px;align-items:center;">
-                        <div class="icon-box">${l.i}</div>
-                        <div><h3 style="margin:0;font-size:16px;">${l.s}</h3><p style="margin:4px 0 0;font-size:12px;color:var(--text-secondary);">${l.r} • ${l.p}</p></div>
-                    </div>
-                </div>`;
-            });
+            section.innerHTML = `<div class="day-title">${escapeHTML(name)}</div>` + items.map(renderLessonCard).join('');
             root.appendChild(section);
+            rendered += items.length;
         });
+        if(rendered === 0 && activeViewMode !== 'today') {
+            root.insertAdjacentHTML('beforeend', '<div class="empty-state">По поиску ничего не нашлось.</div>');
+        }
     }
 
-    initThemes(); loadTheme(); render(); setInterval(render, 30000);
+    function jumpToNow() {
+        const card = document.getElementById('nextLessonCard');
+        if(card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function openResetLayerModal() {
+        document.getElementById('modalTitle').innerText = "СБРОСИТЬ СЛОЙ?";
+        document.getElementById('modalDesc').innerText = "Это очистит текущую картинку, остальные уровни останутся.";
+        const btn = document.getElementById('modalConfirmBtn');
+        btn.onclick = () => {
+            Object.keys(artProgress).forEach(key => {
+                if(key.startsWith(currentArtIdx + '_')) delete artProgress[key];
+            });
+            localStorage.setItem('sumbul_art', JSON.stringify(artProgress));
+            initGame();
+            closeModal();
+        };
+        document.getElementById('customModal').style.display = 'flex';
+    }
+
+    loadScheduleLocal(); sortSchedule(); installPwaManifest(); initThemes(); loadTheme(); loadDesignTuning(); render(); setInterval(render, 30000);
 </script>
 </body>
 </html>
